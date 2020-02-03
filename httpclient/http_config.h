@@ -22,7 +22,7 @@
 #define     HTTP_THREAD_TICK                    50
 
 
-#define     HTTP_NETWORK_TYPE_TLS               HTTP_YES
+#define     HTTP_NETWORK_TYPE_TLS               HTTP_NO
 #define     HTTP_TLS_HANDSHAKE_TIMEOUT          (5 * 1000)
 
 #if HTTP_NETWORK_TYPE_TLS
