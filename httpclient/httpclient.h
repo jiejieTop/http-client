@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "http_parser.h"
+
 #include "list.h"
 #include "platform_timer.h"
 #include "platform_memory.h"
