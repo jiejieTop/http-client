@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-25 23:56:34
- * @LastEditTime : 2020-01-18 13:50:21
+ * @LastEditTime : 2020-02-20 01:07:27
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _SALOF_CONFIG_H_
@@ -19,7 +19,10 @@
 #define         SALOF_OS                    USE_LINUX
 #define         USE_IDLE_HOOK               (0U)
 
+# ifndef LOG_LEVEL
 #define         LOG_LEVEL                   DEBUG_LEVEL   //WARN_LEVEL DEBUG_LEVEL
+#endif
+
 #define         LOG_COLOR                   (1U)
 #define         LOG_TS                      (1U)
 #define         LOG_TAR                     (0U)
@@ -48,7 +51,7 @@
     #define SALOF_TASK_PRIO (0U)
 
 #elif (SALOF_OS == USE_TENCENTOS)
-    #include "tos.h"
+    #include "tos_k.h"
     #define salof_mutex     k_mutex_t*
     #define salof_sem       k_sem_t*
     #define salof_tcb       k_task_t*
@@ -89,5 +92,6 @@ int salof_sem_post(salof_sem sem);
 unsigned int salof_get_tick(void);
 char *salof_get_task_name(void);
 extern int send_buff(char *buf, int len);
+
 #endif // !_SALOF_CONFIG_H_
 

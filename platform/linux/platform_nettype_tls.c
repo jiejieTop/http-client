@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-01-11 19:45:35
- * @LastEditTime : 2020-01-16 00:17:56
+ * @LastEditTime : 2020-02-20 01:12:49
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_nettype_tls.h"
@@ -10,14 +10,15 @@
 #include "platform_memory.h"
 #include "platform_timer.h"
 #include "random.h"
+
+#if MQTT_NETWORK_TYPE_TLS
+
 #include "mbedtls/ssl.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/net_sockets.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/error.h"
 #include "mbedtls/debug.h"
-
-#if HTTP_NETWORK_TYPE_TLS
 
 #if !defined(MBEDTLS_FS_IO)
 static const int ciphersuites[] = { MBEDTLS_TLS_PSK_WITH_AES_128_CBC_SHA, MBEDTLS_TLS_PSK_WITH_AES_256_CBC_SHA, 0 };
@@ -26,6 +27,8 @@ static const int ciphersuites[] = { MBEDTLS_TLS_PSK_WITH_AES_128_CBC_SHA, MBEDTL
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
 static int server_certificate_verify(void *hostname, mbedtls_x509_crt *crt, int depth, uint32_t *flags)
 {
+    if (0 != *flags)
+        LOG_E("%s:%d %s()... server_certificate_verify failed returned 0x%04x\n", __FILE__, __LINE__, __FUNCTION__, *flags);
     return *flags;
 }
 #endif
@@ -48,7 +51,7 @@ static int platform_nettype_tls_entropy_source(void *data, uint8_t *output, size
 
 static int platform_nettype_tls_init(network_t* n, nettype_tls_params_t* nettype_tls_params)
 {
-    int rc = HTTP_SUCCESS_ERROR;
+    int rc = MQTT_SUCCESS_ERROR;
     
     mbedtls_net_init(&(nettype_tls_params->socket_fd));
     mbedtls_ssl_init(&(nettype_tls_params->ssl));
@@ -81,8 +84,8 @@ static int platform_nettype_tls_init(network_t* n, nettype_tls_params_t* nettype
     if (NULL != n->network_params.network_ssl_params.ca_crt) {
         n->network_params.network_ssl_params.ca_crt_len = strlen(n->network_params.network_ssl_params.ca_crt);
 
-        if ((rc = mbedtls_x509_crt_parse(&(nettype_tls_params->ca_cert), (const unsigned char *)n->network_params.network_ssl_params.ca_crt,
-                                          (n->network_params.network_ssl_params.ca_crt_len + 1)))) {
+        if (0 != (rc = (mbedtls_x509_crt_parse(&(nettype_tls_params->ca_cert), (unsigned char *)n->network_params.network_ssl_params.ca_crt,
+                                          (n->network_params.network_ssl_params.ca_crt_len + 1))))) {
             LOG_E("%s:%d %s()... parse ca crt failed returned 0x%04x", __FILE__, __LINE__, __FUNCTION__, (rc < 0 )? -rc : rc);
             RETURN_ERROR(rc);
         }
@@ -124,9 +127,6 @@ static int platform_nettype_tls_init(network_t* n, nettype_tls_params_t* nettype
                                     n->network_params.network_ssl_params.psk_length, (const unsigned char *) psk_id, strlen( psk_id ));
         
         mbedtls_ssl_conf_ciphersuites(&(nettype_tls_params->ssl_conf), ciphersuites);
-    } else {
-        LOG_I("%s:%d %s()... psk or pskid is empty! | psk = %s | psd_id = %s", __FILE__, __LINE__, __FUNCTION__, 
-                n->network_params.network_ssl_params.psk, n->network_params.network_ssl_params.psk_id);
     }
 	
 	if (0 != rc) {
@@ -152,7 +152,7 @@ static int platform_nettype_tls_init(network_t* n, nettype_tls_params_t* nettype
 
     mbedtls_ssl_set_bio(&(nettype_tls_params->ssl), &(nettype_tls_params->socket_fd), mbedtls_net_send, mbedtls_net_recv, mbedtls_net_recv_timeout);
 
-    RETURN_ERROR(HTTP_SUCCESS_ERROR);
+    RETURN_ERROR(MQTT_SUCCESS_ERROR);
 }
 
 
@@ -160,16 +160,16 @@ int platform_nettype_tls_connect(network_t* n)
 {
     int rc;
     if (NULL == n)
-        RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
+        RETURN_ERROR(MQTT_NULL_VALUE_ERROR);
     
     nettype_tls_params_t *nettype_tls_params = (nettype_tls_params_t *) platform_memory_alloc(sizeof(nettype_tls_params_t));
 
     if (NULL == nettype_tls_params)
-        RETURN_ERROR(HTTP_MEM_NOT_ENOUGH_ERROR);
+        RETURN_ERROR(MQTT_MEM_NOT_ENOUGH_ERROR);
 
 
     rc = platform_nettype_tls_init(n, nettype_tls_params);
-    if (HTTP_SUCCESS_ERROR != rc)
+    if (MQTT_SUCCESS_ERROR != rc)
         goto exit;
 
     if (0 != (rc = mbedtls_net_connect(&(nettype_tls_params->socket_fd), n->network_params.addr, n->network_params.port, MBEDTLS_NET_PROTO_TCP)))
@@ -193,7 +193,7 @@ int platform_nettype_tls_connect(network_t* n)
     }
 
     n->network_params.nettype_tls_params = nettype_tls_params;
-    RETURN_ERROR(HTTP_SUCCESS_ERROR)
+    RETURN_ERROR(MQTT_SUCCESS_ERROR)
 
 exit:
     platform_memory_free(nettype_tls_params);
@@ -234,7 +234,7 @@ int platform_nettype_tls_write(network_t *n, unsigned char *buf, int len, int ti
     platform_timer_t timer;
 
     if (NULL == n)
-        RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
+        RETURN_ERROR(MQTT_NULL_VALUE_ERROR);
     
     nettype_tls_params_t *nettype_tls_params = (nettype_tls_params_t *) n->network_params.nettype_tls_params;
 
@@ -262,7 +262,7 @@ int platform_nettype_tls_read(network_t *n, unsigned char *buf, int len, int tim
     platform_timer_t timer;
 
     if (NULL == n)
-        RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
+        RETURN_ERROR(MQTT_NULL_VALUE_ERROR);
     
     nettype_tls_params_t *nettype_tls_params = (nettype_tls_params_t *) n->network_params.nettype_tls_params;
 
@@ -283,4 +283,4 @@ int platform_nettype_tls_read(network_t *n, unsigned char *buf, int len, int tim
     return read_len;
 }
 
-#endif /* HTTP_NETWORK_TYPE_TLS */
+#endif /* MQTT_NETWORK_TYPE_TLS */

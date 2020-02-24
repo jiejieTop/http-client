@@ -15,7 +15,7 @@
 #include "error.h"
 #include "log.h"
 
-#if MQTT_NETWORK_TYPE_TLS
+#ifdef MQTT_NETWORK_TYPE_TLS
 
 typedef struct nettype_tls_params {
     mbedtls_net_context         socket_fd;        /**< mbed TLS network context. */

@@ -8,9 +8,9 @@
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
-#include "http_config.h"
+#include "mqtt_config.h"
 
-#if HTTP_NETWORK_TYPE_TLS
+#if MQTT_NETWORK_TYPE_TLS
 typedef struct network_ssl_params {
     const char		            *ca_crt;
     size_t 		                ca_crt_len;
@@ -26,15 +26,15 @@ typedef struct network_ssl_params {
 #endif
     unsigned int                timeout_ms;            // SSL handshake timeout in millisecond
 } network_ssl_params_t;
-#endif /* HTTP_NETWORK_TYPE_TLS */
+#endif /* MQTT_NETWORK_TYPE_TLS */
 
 typedef struct network_params {
     char                        *addr;
     char                        *port;
-#if HTTP_NETWORK_TYPE_TLS
+#if MQTT_NETWORK_TYPE_TLS
     network_ssl_params_t        network_ssl_params;
     void                        *nettype_tls_params;
-#endif /* HTTP_NETWORK_TYPE_TLS */
+#endif /* MQTT_NETWORK_TYPE_TLS */
 } network_params_t;
 
 typedef struct network {

@@ -2,18 +2,16 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 18:31:44
- * @LastEditTime: 2020-02-23 16:19:20
+ * @LastEditTime : 2020-01-08 20:24:17
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _PLATFORM_THREAD_H_
 #define _PLATFORM_THREAD_H_
 
-#include <pthread.h>
+#include <rtthread.h>
 
 typedef struct platform_thread {
-    pthread_t thread;
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
+    struct rt_thread thread;
 } platform_thread_t;
 
 platform_thread_t *platform_thread_init( const char *name,

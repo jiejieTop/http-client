@@ -34,7 +34,7 @@ int platform_net_socket_connect(const char *host, const char *port, int proto)
             break;
         }
 
-        close(fd);
+        platform_net_socket_close(fd);
         ret = MQTT_CONNECT_FAILED_ERROR;
     }
 
@@ -77,7 +77,7 @@ int platform_net_socket_recv_timeout(int fd, unsigned char *buf, int len, int ti
 
 int platform_net_socket_write(int fd, void *buf, size_t len)
 {
-    return write(fd, buf, len);
+    return send(fd, buf, len, 0);
 }
 
 int platform_net_socket_write_timeout(int fd, unsigned char *buf, int len, int timeout)
@@ -94,22 +94,24 @@ int platform_net_socket_write_timeout(int fd, unsigned char *buf, int len, int t
 
 	setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
 	
-    return write(fd, buf, len);
+	return send(fd, buf, len, 0);
 }
 
 int platform_net_socket_close(int fd)
 {
-    return close(fd);
+    return closesocket(fd);
 }
 
 int platform_net_socket_set_block(int fd)
 {
-    return fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, F_GETFL) & ~O_NONBLOCK);
+    unsigned long mode = 0;
+    return ioctlsocket(fd, FIONBIO, &mode);
 }
 
 int platform_net_socket_set_nonblock(int fd)
 {
-    return fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, F_GETFL) | O_NONBLOCK);
+    unsigned long mode = 1;
+    return ioctlsocket(fd, FIONBIO, &mode);
 }
 
 int platform_net_socket_setsockopt(int fd, int level, int optname, const void *optval, socklen_t optlen)
