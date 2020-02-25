@@ -14,7 +14,7 @@ int platform_net_socket_connect(const char *host, const char *port, int proto)
     fd = tos_sal_module_connect(host, port, TOS_SAL_PROTO_TCP);
     
     if (fd < 0) {
-        return MQTT_CONNECT_FAILED_ERROR;
+        return HTTP_CONNECT_FAILED_ERROR;
     }
     
     return fd;

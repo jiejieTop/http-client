@@ -2,15 +2,15 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:02
- * @LastEditTime : 2020-01-14 03:38:32
+ * @LastEditTime: 2020-02-25 03:11:54
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
-#include "mqtt_config.h"
+#include "http_config.h"
 
-#if MQTT_NETWORK_TYPE_TLS
+#if HTTP_NETWORK_TYPE_TLS
 typedef struct network_ssl_params {
     const char		            *ca_crt;
     size_t 		                ca_crt_len;
@@ -26,15 +26,15 @@ typedef struct network_ssl_params {
 #endif
     unsigned int                timeout_ms;            // SSL handshake timeout in millisecond
 } network_ssl_params_t;
-#endif /* MQTT_NETWORK_TYPE_TLS */
+#endif /* HTTP_NETWORK_TYPE_TLS */
 
 typedef struct network_params {
     char                        *addr;
     char                        *port;
-#if MQTT_NETWORK_TYPE_TLS
+#if HTTP_NETWORK_TYPE_TLS
     network_ssl_params_t        network_ssl_params;
     void                        *nettype_tls_params;
-#endif /* MQTT_NETWORK_TYPE_TLS */
+#endif /* HTTP_NETWORK_TYPE_TLS */
 } network_params_t;
 
 typedef struct network {
