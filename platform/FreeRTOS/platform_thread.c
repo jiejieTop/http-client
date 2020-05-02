@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-23 19:26:27
- * @LastEditTime : 2020-02-15 23:32:25
+ * @LastEditTime: 2020-04-27 22:22:37
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_thread.h"
@@ -15,24 +15,18 @@ platform_thread_t *platform_thread_init( const char *name,
                                         unsigned int priority,
                                         unsigned int tick)
 {
+    BaseType_t err;
     platform_thread_t *thread;
-    k_err_t err;
-    k_stack_t *thread_stack;
+    
     thread = platform_memory_alloc(sizeof(platform_thread_t));
-    thread_stack = (k_stack_t*) platform_memory_alloc(stack_size);
-    
-    err = tos_task_create(&(thread->thread), 
-                          (char*)name, 
-                          entry,
-                          param, 
-                          priority, 
-                          thread_stack,
-                          stack_size,
-                          tick);
-    
-    if(err != K_ERR_NONE) {
+
+    (void)tick;
+
+    err =  xTaskCreate(entry, name, stack_size, param, priority, thread->thread);
+
+    if(pdPASS != err) {
         platform_memory_free(thread);
-        platform_memory_free(thread_stack);
+        return NULL;
     }
 
     return thread;
@@ -46,21 +40,20 @@ void platform_thread_startup(platform_thread_t* thread)
 
 void platform_thread_stop(platform_thread_t* thread)
 {
-    tos_task_suspend(&(thread->thread));
+    vTaskSuspend(thread->thread);
 }
 
 void platform_thread_start(platform_thread_t* thread)
 {
-    tos_task_resume(&(thread->thread));
+    vTaskResume(thread->thread);
 }
-
 
 void platform_thread_destroy(platform_thread_t* thread)
 {
     if (NULL != thread)
-        tos_task_destroy(&(thread->thread));
-    platform_memory_free(&(thread->thread));
-    platform_memory_free(&(thread->thread.stk_size));
+        vTaskDelete(thread->thread);
+    
+    platform_memory_free(thread);
 }
 
 

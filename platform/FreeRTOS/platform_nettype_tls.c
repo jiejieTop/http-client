@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-01-11 19:45:35
- * @LastEditTime: 2020-04-27 23:40:19
+ * @LastEditTime: 2020-04-27 23:41:03
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_nettype_tls.h"
@@ -13,15 +13,12 @@
 
 #ifdef HTTP_NETWORK_TYPE_TLS
 
-#include "mbedtls/platform.h"
 #include "mbedtls/ssl.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/net_sockets.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/error.h"
 #include "mbedtls/debug.h"
-#include "mbedtls\x509_crt.h"
-#include "mbedtls\pk.h"
 
 #if !defined(MBEDTLS_FS_IO)
 static const int ciphersuites[] = { MBEDTLS_TLS_PSK_WITH_AES_128_CBC_SHA, MBEDTLS_TLS_PSK_WITH_AES_256_CBC_SHA, 0 };
@@ -55,8 +52,6 @@ static int platform_nettype_tls_entropy_source(void *data, uint8_t *output, size
 static int platform_nettype_tls_init(network_t* n, nettype_tls_params_t* nettype_tls_params)
 {
     int rc = HTTP_SUCCESS_ERROR;
-    
-    mbedtls_platform_set_calloc_free(platform_memory_calloc, platform_memory_free);
     
     mbedtls_net_init(&(nettype_tls_params->socket_fd));
     mbedtls_ssl_init(&(nettype_tls_params->ssl));
@@ -113,15 +108,15 @@ static int platform_nettype_tls_init(network_t* n, nettype_tls_params_t* nettype
     if (n->network_params.network_ssl_params.cert_file != NULL && n->network_params.network_ssl_params.key_file != NULL) {
             if ((rc = mbedtls_x509_crt_parse_file(&(nettype_tls_params->client_cert), n->network_params.network_ssl_params.cert_file)) != 0) {
             HTTP_LOG_E("%s:%d %s()... load client cert file failed returned 0x%04x", __FILE__, __LINE__, __FUNCTION__, (rc < 0 )? -rc : rc);
-            return HTTP_SSL_CERT_ERROR;
+            return PLATFORM_ERR_SSL_CERT;
         }
 
         if ((rc = mbedtls_pk_parse_keyfile(&(nettype_tls_params->private_key), n->network_params.network_ssl_params.key_file, "")) != 0) {
             HTTP_LOG_E("%s:%d %s()... load client key file failed returned 0x%04x", __FILE__, __LINE__, __FUNCTION__, (rc < 0 )? -rc : rc);
-            return HTTP_SSL_CERT_ERROR;
+            return PLATFORM_ERR_SSL_CERT;
         }
     } else {
-        HTTP_LOG_I("%s:%d %s()... cert_file/key_file is empty! | cert_file = %s | key_file = %s", __FILE__, __LINE__, __FUNCTION__,
+        LOG_I("%s:%d %s()... cert_file/key_file is empty! | cert_file = %s | key_file = %s", __FILE__, __LINE__, __FUNCTION__,
                 n->network_params.network_ssl_params.cert_file, n->network_params.network_ssl_params.key_file);
     }
 #else
@@ -132,13 +127,12 @@ static int platform_nettype_tls_init(network_t* n, nettype_tls_params_t* nettype
                                     n->network_params.network_ssl_params.psk_length, (const unsigned char *) psk_id, strlen( psk_id ));
         
         mbedtls_ssl_conf_ciphersuites(&(nettype_tls_params->ssl_conf), ciphersuites);
-        
-        if (0 != rc) {
-            HTTP_LOG_E("%s:%d %s()... mbedtls_ssl_conf_psk fail: 0x%04x", __FILE__, __LINE__, __FUNCTION__, (rc < 0 )? -rc : rc);
-            return rc;
-        }
     }
 	
+	if (0 != rc) {
+		HTTP_LOG_E("%s:%d %s()... mbedtls_ssl_conf_psk fail: 0x%04x", __FILE__, __LINE__, __FUNCTION__, (rc < 0 )? -rc : rc);
+		return rc;
+	}
 #endif
 #endif
 

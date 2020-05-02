@@ -2,16 +2,17 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 18:31:44
- * @LastEditTime : 2020-01-08 20:24:17
+ * @LastEditTime: 2020-04-27 17:04:25
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _PLATFORM_THREAD_H_
 #define _PLATFORM_THREAD_H_
 
-#include "tos_k.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 typedef struct platform_thread {
-    k_task_t thread;
+    TaskHandle_t thread;
 } platform_thread_t;
 
 platform_thread_t *platform_thread_init( const char *name,

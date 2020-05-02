@@ -6,7 +6,6 @@ if (DIR_SRCS)
     foreach(libname ${LIBNAMES})
         if (${LIB_NAME} STREQUAL ${libname})
             add_library(${libname} STATIC ${DIR_SRCS})
-            target_link_libraries(${libname} "http" "platform" "common")
         endif()
     endforeach()
 

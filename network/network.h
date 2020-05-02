@@ -2,15 +2,15 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:02
- * @LastEditTime: 2020-02-25 03:11:54
+ * @LastEditTime: 2020-02-25 03:49:11
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
-#include "http_config.h"
+#include "http_defconfig.h"
 
-#if HTTP_NETWORK_TYPE_TLS
+#ifdef HTTP_NETWORK_TYPE_TLS
 typedef struct network_ssl_params {
     const char		            *ca_crt;
     size_t 		                ca_crt_len;
@@ -31,7 +31,7 @@ typedef struct network_ssl_params {
 typedef struct network_params {
     char                        *addr;
     char                        *port;
-#if HTTP_NETWORK_TYPE_TLS
+#ifdef HTTP_NETWORK_TYPE_TLS
     network_ssl_params_t        network_ssl_params;
     void                        *nettype_tls_params;
 #endif /* HTTP_NETWORK_TYPE_TLS */

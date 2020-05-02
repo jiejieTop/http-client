@@ -1,6 +1,7 @@
 #ifndef _SALOF_H_
 #define _SALOF_H_
 
+#include "salof_defconfig.h"
 #include "format.h"
 #include "fifo.h"
 #include <stdio.h>
@@ -18,21 +19,19 @@ void salof(const char *fmt, ...);
 #define     FC_DARK     36
 #define     FC_WHITE    37
 
-#if USE_LOG
+#ifdef USE_LOG
 
 #if USE_SALOF
-    #define     PRINT_LOG       salof
+    #define     PRINT_LOG           salof
 #else
+
 #if ((!USE_SALOF)&&(!PRINT_LOG))
-    #define         PRINT_LOG                       printf
+    #define         PRINT_LOG       printf
 #endif
 
 #ifndef PRINT_LOG
     #error "If the USE_LOG macro definition is turned on, you must define PRINT_LOG as the LOG output, such as #definePRINT_LOG printf"
 #endif
-#endif
-
-#if LOG_TS || LOG_TAR
 
 #endif
 
@@ -64,8 +63,7 @@ void salof(const char *fmt, ...);
     } while (0)
 
 #define BASE_LEVEL      (0)
-#define ASSERT_LEVEL    (BASE_LEVEL + 1)
-#define ERR_LEVEL       (ASSERT_LEVEL + 1)
+#define ERR_LEVEL       (BASE_LEVEL + 1)
 #define WARN_LEVEL      (ERR_LEVEL + 1)
 #define INFO_LEVEL      (WARN_LEVEL + 1)
 #define DEBUG_LEVEL     (INFO_LEVEL + 1)
@@ -98,14 +96,6 @@ void salof(const char *fmt, ...);
     #define LOG_ERR(fmt, ...)       LOG_LINE(E, FC_RED, fmt, ##__VA_ARGS__)
 #endif
 
-#if LOG_LEVEL < ASSERT_LEVEL
-    #define LOG_ASSERT(fmt, ...)
-    #define ASSERT(x)
-#else
-    #define LOG_ASSERT(fmt, ...)    LOG_LINE(A, FC_RED, fmt, ##__VA_ARGS__)
-    #define ASSERT(x)     if((x)==0) LOG_ASSERT("%s, %d\n",__FILE__,__LINE__)
-#endif
-
 #if LOG_LEVEL < BASE_LEVEL
     #define LOG(fmt, ...)
 #else
@@ -117,7 +107,6 @@ void salof(const char *fmt, ...);
 #define LOG_WARN(fmt, ...)
 #define LOG_ERR(fmt, ...)
 #define LOG(fmt, ...)
-#define ASSERT(x)
 #endif
 
 #endif // !_SALOF_H_

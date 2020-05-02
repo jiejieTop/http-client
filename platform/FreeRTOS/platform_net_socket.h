@@ -2,31 +2,20 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 13:39:00
- * @LastEditTime: 2020-04-27 23:32:44
+ * @LastEditTime: 2020-04-27 23:46:54
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _PLATFORM_NET_SOCKET_H_
 #define _PLATFORM_NET_SOCKET_H_
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/select.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
-#include <fcntl.h>
-
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
 
 #include "network.h"
 #include "http_error.h"
+
+#include "lwip/opt.h"
+#include "lwip/sys.h"
+#include "lwip/api.h"
+#include <lwip/sockets.h>
+#include "lwip/netdb.h"
 
 #define PLATFORM_NET_PROTO_TCP  0 /**< The TCP transport protocol */
 #define PLATFORM_NET_PROTO_UDP  1 /**< The UDP transport protocol */

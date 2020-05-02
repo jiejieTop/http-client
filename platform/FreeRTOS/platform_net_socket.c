@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-01-10 23:45:59
- * @LastEditTime: 2020-04-25 17:54:44
+ * @LastEditTime: 2020-04-25 17:50:58
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_net_socket.h"
@@ -10,17 +10,6 @@
 int platform_net_socket_connect(const char *host, const char *port, int proto)
 {
     int fd, ret = HTTP_SOCKET_UNKNOWN_HOST_ERROR;
-#ifdef HTTP_NETSOCKET_USE_AT
-
-    fd = tos_sal_module_connect(host, port, TOS_SAL_PROTO_TCP);
-    
-    if (fd < 0) {
-        return HTTP_CONNECT_FAILED_ERROR;
-    }
-    ret = fd;
-    
-#else
-    
     struct addrinfo hints, *addr_list, *cur;
     
     /* Do name resolution with both IPv6 and IPv4 */
@@ -45,30 +34,21 @@ int platform_net_socket_connect(const char *host, const char *port, int proto)
             break;
         }
 
-        close(fd);
+        platform_net_socket_close(fd);
         ret = HTTP_CONNECT_FAILED_ERROR;
     }
 
     freeaddrinfo(addr_list);
-#endif
-
     return ret;
 }
 
 int platform_net_socket_recv(int fd, void *buf, size_t len, int flags)
 {
-#ifdef HTTP_NETSOCKET_USE_AT
-    return tos_sal_module_recv(fd, buf, len);
-#else
     return recv(fd, buf, len, flags);
-#endif
 }
 
 int platform_net_socket_recv_timeout(int fd, unsigned char *buf, int len, int timeout)
 {
-#ifdef HTTP_NETSOCKET_USE_AT
-    return tos_sal_module_recv_timeout(fd, buf, len, timeout);
-#else
     int rc;
     int bytes = 0;
 	struct timeval tv = {
@@ -93,23 +73,15 @@ int platform_net_socket_recv_timeout(int fd, unsigned char *buf, int len, int ti
 		}
 	}
 	return bytes;
-#endif
 }
 
 int platform_net_socket_write(int fd, void *buf, size_t len)
 {
-#ifdef HTTP_NETSOCKET_USE_AT
-    return tos_sal_module_send(fd, buf, len);
-#else
-    return write(fd, buf, len);
-#endif
+    return send(fd, buf, len, 0);
 }
 
 int platform_net_socket_write_timeout(int fd, unsigned char *buf, int len, int timeout)
 {
-#ifdef HTTP_NETSOCKET_USE_AT
-    return tos_sal_module_send(fd, buf, len);
-#else
 	struct timeval tv = {
         timeout / 1000, 
         (timeout % 1000) * 1000
@@ -120,31 +92,26 @@ int platform_net_socket_write_timeout(int fd, unsigned char *buf, int len, int t
 		tv.tv_usec = 100;
 	}
 
-	platform_net_socket_setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
+	setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
 	
-    return write(fd, buf, len);
-#endif
+	return send(fd, buf, len, 0);
 }
 
 int platform_net_socket_close(int fd)
 {
-#ifdef HTTP_NETSOCKET_USE_AT
-    return tos_sal_module_close(fd);
-#else
-    return close(fd);
-#endif
+    return closesocket(fd);
 }
-
-#ifndef HTTP_NETSOCKET_USE_AT
 
 int platform_net_socket_set_block(int fd)
 {
-    return fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, F_GETFL) & ~O_NONBLOCK);
+    unsigned long mode = 0;
+    return ioctlsocket(fd, FIONBIO, &mode);
 }
 
 int platform_net_socket_set_nonblock(int fd)
 {
-    return fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, F_GETFL) | O_NONBLOCK);
+    unsigned long mode = 1;
+    return ioctlsocket(fd, FIONBIO, &mode);
 }
 
 int platform_net_socket_setsockopt(int fd, int level, int optname, const void *optval, socklen_t optlen)
@@ -152,4 +119,3 @@ int platform_net_socket_setsockopt(int fd, int level, int optname, const void *o
     return setsockopt(fd, level, optname, optval, optlen);
 }
 
-#endif

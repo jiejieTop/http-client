@@ -2,21 +2,23 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-10 22:16:41
- * @LastEditTime: 2020-04-27 22:37:33
+ * @LastEditTime: 2020-04-27 22:35:34
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
 #include "platform_timer.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 static uint32_t platform_uptime_ms(void)
 {
-#if (TOS_CFG_CPU_TICK_PER_SECOND == 1000)
-    return (uint32_t)tos_systick_get();
+#if (configTICK_RATE_HZ == 1000)
+    return (uint32_t)xTaskGetTickCount();
 #else
-    k_tick_t tick = 0u;
+    TickType_t tick = 0u;
 
-    tick = tos_systick_get() * 1000;
-    return (uint32_t)((tick + TOS_CFG_CPU_TICK_PER_SECOND - 1) / TOS_CFG_CPU_TICK_PER_SECOND);
+    tick = xTaskGetTickCount() * 1000;
+    return (uint32_t)((tick + configTICK_RATE_HZ - 1) / configTICK_RATE_HZ);
 #endif
 }
 
@@ -55,19 +57,16 @@ unsigned long platform_timer_now(void)
 
 void platform_timer_usleep(unsigned long usec)
 {
-    uint32_t ms;
-    k_tick_t tick;
+
+    TickType_t tick;
 
     if(usec != 0) {
+        tick = usec / portTICK_PERIOD_MS;
         
-        ms = usec / TOS_CFG_CPU_TICK_PER_SECOND;
-
-        if (ms == 0) {
-            ms = 1;
-        }
+        if (tick == 0)
+            tick = 1;
     }
 
-    tick = tos_millisec2tick(ms);
-
-    tos_sleep_ms(tick);
+    vTaskDelay(tick);
 }
+
