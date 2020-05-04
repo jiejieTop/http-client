@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-03 23:20:02
+ * @LastEditTime: 2020-05-04 18:55:46
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -13,15 +13,16 @@
 #include <http_parser.h>
 
 typedef enum http_request_method {
-    HTTP_REQUEST_METHOD_GET          =   0x00,       /* http GET method, http/1.0 */
-    HTTP_REQUEST_METHOD_POST         =   0x01,       /* http POST method, http/1.0 */
-    HTTP_REQUEST_METHOD_HEAD         =   0x02,       /* http HEAD method, http/1.0 */
+    HTTP_REQUEST_METHOD_INVALID      =   0x00,
+    HTTP_REQUEST_METHOD_GET          =   0x01,       /* http GET method, http/1.0 */
+    HTTP_REQUEST_METHOD_POST         =   0x02,       /* http POST method, http/1.0 */
+    HTTP_REQUEST_METHOD_HEAD         =   0x03,       /* http HEAD method, http/1.0 */
     HTTP_REQUEST_METHOD_PUT          =   0x04,       /* http PUT method, http/1.1 */
-    HTTP_REQUEST_METHOD_DELETE       =   0x08,       /* http DELETE method, http/1.1 */
-    HTTP_REQUEST_METHOD_OPTIONS      =   0x10,       /* http OPTIONS method, http/1.1 */
-    HTTP_REQUEST_METHOD_TRACE        =   0x11,       /* http TRACE method, http/1.1 */
-    HTTP_REQUEST_METHOD_CONNECT      =   0x12,       /* http CONNECT method, http/1.1, reserved */
-    HTTP_REQUEST_METHOD_PATCH        =   0x14        /* http PATCH method, echo test */
+    HTTP_REQUEST_METHOD_DELETE       =   0x05,       /* http DELETE method, http/1.1 */
+    HTTP_REQUEST_METHOD_OPTIONS      =   0x06,       /* http OPTIONS method, http/1.1 */
+    HTTP_REQUEST_METHOD_TRACE        =   0x07,       /* http TRACE method, http/1.1 */
+    HTTP_REQUEST_METHOD_CONNECT      =   0x08,       /* http CONNECT method, http/1.1, reserved */
+    HTTP_REQUEST_METHOD_PATCH        =   0x09        /* http PATCH method, echo test */
 } http_request_method_t;
 
 // typedef struct {
@@ -52,14 +53,13 @@ typedef struct http_connect_params {
 
 
 typedef struct http_interceptor {
+    network_t                   *network;
     network_params_t            network_params;
     http_connect_params_t       connect_params;
+    struct http_parser          *parser;
+    struct http_parser_settings *parser_settings;
     
 } http_interceptor_t;
-
-
-int http_interceptor_connect_request(http_interceptor_t *interceptor, const char* url, http_request_method_t method);
-int http_interceptor_reconnect_request(http_interceptor_t *interceptor, const char* url, http_request_method_t method);
 
 
 

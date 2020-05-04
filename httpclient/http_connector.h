@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:36:06
- * @LastEditTime: 2020-05-03 23:37:46
+ * @LastEditTime: 2020-05-04 13:51:15
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -18,32 +18,32 @@
     #define HTTP_CONNECT_POOL_MAX_NUM   4
 #endif
 
-#define HTTP_GET_CONNECT_PARAMS_DEFINE(name)                                            \
-    char *http_get_connect_params_##name(http_connect_params_t *connect_params) {       \
-        HTTP_ROBUSTNESS_CHECK((connect_params), NULL);                                  \
-        return connect_params->http_##name;                                             \
+#define HTTP_GET_CONNECT_PARAMS_DEFINE(name, type, res)                                     \
+    type http_get_connect_params_##name(http_connect_params_t *connect_params) {            \
+        HTTP_ROBUSTNESS_CHECK((connect_params), res);                                       \
+        return connect_params->http_##name;                                                 \
     }
 
-#define HTTP_SET_CONNECT_PARAMS_DEFINE(name)                                                    \
-    char *http_set_connect_params_##name(http_connect_params_t *connect_params, char *ptr) {    \
-        HTTP_ROBUSTNESS_CHECK((connect_params && ptr), NULL);                                   \
-        connect_params->http_##name = ptr;                                                      \
-        return connect_params->http_##name;                                                     \
+#define HTTP_SET_CONNECT_PARAMS_DEFINE(name, type, res)                                     \
+    type http_set_connect_params_##name(http_connect_params_t *connect_params, type t) {    \
+        HTTP_ROBUSTNESS_CHECK((connect_params && t), res);                                  \
+        connect_params->http_##name = t;                                                    \
+        return connect_params->http_##name;                                                 \
     }
 
-#define HTTP_GET_CONNECT_PARAMS_STATEMENT(name)                                         \
-    char *http_get_connect_params_##name(http_connect_params_t *);
+#define HTTP_GET_CONNECT_PARAMS_STATEMENT(name, type)                   \
+    type http_get_connect_params_##name(http_connect_params_t *);
 
-#define HTTP_SET_CONNECT_PARAMS_STATEMENT(name)                                         \
-    char *http_set_connect_params_##name(http_connect_params_t *, char *);
+#define HTTP_SET_CONNECT_PARAMS_STATEMENT(name, type)                   \
+    type http_set_connect_params_##name(http_connect_params_t *, type);
 
-#define HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(name)       \
-    HTTP_SET_CONNECT_PARAMS_DEFINE(name)                   \
-    HTTP_GET_CONNECT_PARAMS_DEFINE(name)
+#define HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(name, type, res)         \
+    HTTP_SET_CONNECT_PARAMS_DEFINE(name, type, res)                     \
+    HTTP_GET_CONNECT_PARAMS_DEFINE(name, type, res)
 
-#define HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(name)    \
-    HTTP_SET_CONNECT_PARAMS_STATEMENT(name)                \
-    HTTP_GET_CONNECT_PARAMS_STATEMENT(name)
+#define HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(name, type)           \
+    HTTP_SET_CONNECT_PARAMS_STATEMENT(name, type)                       \
+    HTTP_GET_CONNECT_PARAMS_STATEMENT(name, type)
 
 typedef struct http_response {
 	struct parsed_url *request_uri;
@@ -66,25 +66,16 @@ typedef enum http_connect_status {
 } http_connect_status_t;
 
 
-typedef struct http_client {
-    http_connect_status_t               status;
-    http_list_t                         connect_pool_list;
-    // network_t                   *network;
-    
-} http_client_t;
-
-
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(url)
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(scheme)
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(host)
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(username)
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(password)
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(path)
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(query)
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(farg)
-
-uint16_t http_get_connect_params_port(http_connect_params_t *connect_params);
-uint16_t http_set_connect_params_port(http_connect_params_t *connect_params, uint16_t port);
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(url, char*)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(scheme, char*)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(host, char*)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(username, char*)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(password, char*)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(path, char*)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(query, char*)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(farg, char*)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(port, uint16_t)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(method, http_request_method_t)
 
 http_connect_params_t *http_assign_connect_params(void);
 void http_release_connect_params(http_connect_params_t *connect_params);

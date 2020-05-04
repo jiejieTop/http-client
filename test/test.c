@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-03 22:28:40
+ * @LastEditTime: 2020-05-04 18:57:49
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -28,7 +28,7 @@ int main(void)
 
     HTTP_LOG_I("url:%s", URL);
     
-    http_interceptor_connect_request(&interceptor, URL, HTTP_REQUEST_METHOD_GET);
+    http_url_parsing(&interceptor.connect_params, URL);
 
     HTTP_LOG_I("host:%s", interceptor.connect_params.http_host);
     HTTP_LOG_I("port:%d", interceptor.connect_params.http_port);
