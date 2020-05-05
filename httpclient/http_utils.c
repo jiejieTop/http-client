@@ -2,14 +2,13 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-03 13:35:08
- * @LastEditTime: 2020-05-04 15:14:50
+ * @LastEditTime: 2020-05-05 17:36:01
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
 #include <http_utils.h>
 #include <platform_memory.h>
-#include <string.h>
-#include <http_log.h>
+
 
 
 int _http_utils_isspace(int x)
@@ -28,6 +27,32 @@ int _http_utils_isdigit(int x)
         return 0;
 }
 
+size_t http_utils_count_concat(va_list *ap)
+{
+    size_t total = 0;
+    char *next;
+
+    while ((next = va_arg(*ap, char *)) != NULL)
+    total += strlen(next);
+
+    return total;
+}
+
+void http_utils_concat(char *str, va_list *ap) 
+{
+    char *next;
+
+    while ((next = va_arg(*ap, char *)) != NULL) {
+#ifdef HAVE_STPCPY
+        str = stpcpy(str, next);
+#else
+	size_t len = strlen(next);
+	memcpy(str, next, len);
+	str += len;
+#endif
+    }
+}
+
 
 char *http_utils_assign_string(char **str, const char *new_str, int len)
 {
@@ -43,11 +68,11 @@ char *http_utils_assign_string(char **str, const char *new_str, int len)
     }
 
     if (old_str) {
-        platform_memory_free(old_str);
-        old_str = NULL;
-    } 
-    
-    old_str = platform_memory_alloc(l + 1);
+        old_str = platform_memory_realloc(old_str, l + 1);
+        old_str[l] = 0;
+    } else {
+        old_str = platform_memory_alloc(l + 1);
+    }
 
     if (NULL != old_str) {
         memcpy(old_str, new_str, l);
@@ -136,3 +161,11 @@ char *http_utils_itoa(int value, char *string, int radix)
 
     return string;
 }
+
+
+
+
+
+
+
+

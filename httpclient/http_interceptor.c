@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-04 18:56:25
+ * @LastEditTime: 2020-05-05 17:30:26
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -12,7 +12,7 @@
 #include <http_utils.h>
 #include <http_url_parser.h>
 #include <http_connector.h>
-#include "platform_memory.h"
+#include <platform_memory.h>
 
 
 static int _http_interceptor_set_network(http_interceptor_t *interceptor)
@@ -76,6 +76,8 @@ int http_interceptor_connect(http_interceptor_t *interceptor)
 
     RETURN_ERROR(res);
 }
+
+
 
 int http_interceptor_request(http_interceptor_t *interceptor)
 {

@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-02-25 03:36:09
- * @LastEditTime: 2020-05-02 11:28:36
+ * @LastEditTime: 2020-05-05 20:29:23
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -46,6 +46,19 @@
 #ifndef HTTP_THREAD_TICK
     #define     HTTP_THREAD_TICK                    50
 #endif // !HTTP_THREAD_TICK
+
+
+
+#define HTTP_MESSAGE_BUFFER_GROWTH  64
+
+#define HTTP_VERSION_SRTING     " HTTP/"
+#define HTTP_VERSION_MAJOR      "1"
+#define HTTP_VERSION_MINOR      ".1"
+
+#define HTTP_CRLF               "\r\n"
+#define HTTP_DEFAULT_PATH       "/"
+#define HTTP_DEFAULT_VERSION    (HTTP_VERSION_SRTING HTTP_VERSION_MAJOR HTTP_VERSION_MINOR)
+
 
 
 #ifdef HTTP_NETWORK_TYPE_TLS

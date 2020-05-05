@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:36:06
- * @LastEditTime: 2020-05-04 13:51:15
+ * @LastEditTime: 2020-05-05 10:47:27
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -75,7 +75,7 @@ HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(path, char*)
 HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(query, char*)
 HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(farg, char*)
 HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(port, uint16_t)
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(method, http_request_method_t)
+// HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(method, http_request_method_t)
 
 http_connect_params_t *http_assign_connect_params(void);
 void http_release_connect_params(http_connect_params_t *connect_params);

@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-04 18:55:46
+ * @LastEditTime: 2020-05-05 17:39:18
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -11,19 +11,8 @@
 
 #include <network.h>
 #include <http_parser.h>
+#include <http_request.h>
 
-typedef enum http_request_method {
-    HTTP_REQUEST_METHOD_INVALID      =   0x00,
-    HTTP_REQUEST_METHOD_GET          =   0x01,       /* http GET method, http/1.0 */
-    HTTP_REQUEST_METHOD_POST         =   0x02,       /* http POST method, http/1.0 */
-    HTTP_REQUEST_METHOD_HEAD         =   0x03,       /* http HEAD method, http/1.0 */
-    HTTP_REQUEST_METHOD_PUT          =   0x04,       /* http PUT method, http/1.1 */
-    HTTP_REQUEST_METHOD_DELETE       =   0x05,       /* http DELETE method, http/1.1 */
-    HTTP_REQUEST_METHOD_OPTIONS      =   0x06,       /* http OPTIONS method, http/1.1 */
-    HTTP_REQUEST_METHOD_TRACE        =   0x07,       /* http TRACE method, http/1.1 */
-    HTTP_REQUEST_METHOD_CONNECT      =   0x08,       /* http CONNECT method, http/1.1, reserved */
-    HTTP_REQUEST_METHOD_PATCH        =   0x09        /* http PATCH method, echo test */
-} http_request_method_t;
 
 // typedef struct {
 //     http_header_handle_t headers;       /*!< http header */
@@ -36,6 +25,7 @@ typedef enum http_request_method {
 //     bool                is_chunked;
 // } http_data_t;
 
+
 typedef struct http_connect_params {
     char                        *http_url;
     char                        *http_scheme;
@@ -47,7 +37,6 @@ typedef struct http_connect_params {
     char                        *http_farg;
     char                        *http_cert_pem;
     uint16_t                    http_port;
-    http_request_method_t       http_method;
 } http_connect_params_t;
 
 
@@ -56,11 +45,11 @@ typedef struct http_interceptor {
     network_t                   *network;
     network_params_t            network_params;
     http_connect_params_t       connect_params;
+    http_request_t              request;
     struct http_parser          *parser;
     struct http_parser_settings *parser_settings;
     
 } http_interceptor_t;
-
 
 
 
