@@ -132,15 +132,31 @@ typedef struct http_request {
 
 ## 外部函数
 
-- `int http_request_init(http_request_t *req)` ：http请求初始化，主要是为请求报文分配内存空间。
+- http请求初始化，主要是为请求报文分配内存空间。
 
-- `int http_request_start_line(http_request_t *req,  http_request_method_t method, const char *path)` ：构造请求起始行，传入请求的方法、路径。
+```c
+int http_request_init(http_request_t *req)
+```
 
-- `void http_request_add_header(http_request_t *req, const char *key, const char *value)` ：添加请求头部的内容，指定`key： value`，`key`字段内容可参考[HTTP RFC](https://tools.ietf.org/html/rfc2616#section-4.2)，也可参考`HTTP_REQUEST_HEADERS_MAPPING`数组的内容。
+- 构造请求起始行，传入请求的方法、路径。
 
-- `void http_request_add_header_form_index(http_request_t *req, http_request_header_t header, const char *value)` ：通过索引的方式添加请求头部的`value`字段。
+```c
+int http_request_start_line(http_request_t *req,  http_request_method_t method, const char *path)
+```
 
+- 添加请求头部的内容，指定`key： value`，`key`字段内容可参考[HTTP RFC](https://tools.ietf.org/html/rfc2616#section-4.2)，也可参考`HTTP_REQUEST_HEADERS_MAPPING`数组的内容。
 
+```c
+void http_request_add_header(http_request_t *req, const char *key, const char *value)
+```
 
+- 通过索引的方式添加请求头部的`value`字段。
 
+```c
+void http_request_add_header_form_index(http_request_t *req, http_request_header_t header, const char *value)
+```
+
+**上一篇**：[HTTP报文处理](./message_buffer.md)
+
+**下一篇**： [待定]()
 

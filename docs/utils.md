@@ -8,17 +8,41 @@
 
 ## 外部函数
 
-- `size_t http_utils_count_concat(va_list *ap)` ：计算传入的字符串长度，以NULL结尾。
+- 计算传入的字符串长度，以NULL结尾。
 
-- `void http_utils_concat(char *str, va_list *ap)` ：将字符串连接到指定的`str`后面。
+```c
+size_t http_utils_count_concat(va_list *ap)
+```
 
-- `char *http_utils_assign_string(char **str, const char *new_str, int len)` ：给`str`填充指定的字符串，在空间不足的情况下自动分配内存空间，`str`可为`NULL`，当`str`有值的时候必须是由动态内存分配的。
+- 将字符串连接到指定的`str`后面。
 
-- `void http_utils_release_string(char *str)` ：释放字符串的内存空间。
+```c
+void http_utils_concat(char *str, va_list *ap)
+```
 
-- `int http_utils_atoi(const char *nptr)` ：字符串转`int`类型。
+- 给`str`填充指定的字符串，在空间不足的情况下自动分配内存空间，`str`可为`NULL`，当`str`有值的时候必须是由动态内存分配的。
 
-- `char *http_utils_itoa(int value, char *string, int radix)` ：`int`类型转字符串，`string`是保存字符串的空间，`radix`是基数，一般为`10`，转为十进制的数。
+```c
+char *http_utils_assign_string(char **str, const char *new_str, int len)
+```
+
+- 释放字符串的内存空间。
+
+```c
+void http_utils_release_string(char *str)
+```
+
+- 字符串转`int`类型。
+
+```c
+int http_utils_atoi(const char *nptr)
+```
+
+- `int`类型转字符串，`string`是保存字符串的空间，`radix`是基数，一般为`10`，转为十进制的数。
+
+```c
+char *http_utils_itoa(int value, char *string, int radix)
+```
 
 
 ## 宏定义
@@ -33,8 +57,19 @@
 
 ## 内部函数
 
-- `int _http_utils_isspace(int x)` ：判断是否为空。
+- 判断是否为空。
 
-- `int _http_utils_isdigit(int x)` ：判断是否为数字。
+```c
+int _http_utils_isspace(int x)
+```
 
+- 判断是否为数字。
+
+```c
+int _http_utils_isdigit(int x) 
+```
+
+**上一篇**：[network网卡](./network.md)
+
+**下一篇**： [url解析器](./url_parser.md)
 
