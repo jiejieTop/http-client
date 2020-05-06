@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-05 17:30:26
+ * @LastEditTime: 2020-05-06 09:08:40
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -10,6 +10,7 @@
 #include <http_log.h>
 #include <http_error.h>
 #include <http_utils.h>
+#include <http_parser.h>
 #include <http_url_parser.h>
 #include <http_connector.h>
 #include <platform_memory.h>

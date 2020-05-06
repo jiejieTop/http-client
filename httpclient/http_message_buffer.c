@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:21:58
- * @LastEditTime: 2020-05-05 19:33:00
+ * @LastEditTime: 2020-05-06 09:29:09
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -55,10 +55,10 @@ void http_message_buffer_concat(http_message_buffer_t *buf, ...)
     buf->data[total - 1] = '\0';
 }
 
-void http_message_buffer_append(http_message_buffer_t *buf, const char *data, size_t len) 
+void http_message_buffer_append(http_message_buffer_t *buf, const char *str, size_t len) 
 {
     _http_message_buffer_grow(buf, buf->used + len);
-    memcpy(buf->data + buf->used - 1, data, len);
+    memcpy(buf->data + buf->used - 1, str, len);
     buf->used += len;
     buf->data[buf->used - 1] = '\0';
 }

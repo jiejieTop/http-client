@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:42
- * @LastEditTime: 2020-05-05 21:40:20
+ * @LastEditTime: 2020-05-06 10:02:45
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_REQUEST_H_
@@ -80,7 +80,7 @@ typedef struct http_request {
     } req_flag;
 } http_request_t;
 
-
+int http_request_init(http_request_t *req);
 int http_request_start_line(http_request_t *req,  http_request_method_t method, const char *path);
 void http_request_add_header(http_request_t *req, const char *key, const char *value);
 void http_request_add_header_form_index(http_request_t *req, http_request_header_t header, const char *value);

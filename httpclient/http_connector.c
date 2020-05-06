@@ -2,10 +2,11 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:36:06
- * @LastEditTime: 2020-05-04 13:50:14
+ * @LastEditTime: 2020-05-06 09:06:23
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
+#include <http_url_parser.h>
 #include <http_connector.h>
 #include <http_log.h>
 #include <http_error.h>

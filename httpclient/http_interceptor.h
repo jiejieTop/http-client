@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-05 17:39:18
+ * @LastEditTime: 2020-05-06 09:08:26
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -12,7 +12,7 @@
 #include <network.h>
 #include <http_parser.h>
 #include <http_request.h>
-
+#include <http_url_parser.h>
 
 // typedef struct {
 //     http_header_handle_t headers;       /*!< http header */
@@ -24,20 +24,6 @@
 //     int                 method;         /*!< http method */
 //     bool                is_chunked;
 // } http_data_t;
-
-
-typedef struct http_connect_params {
-    char                        *http_url;
-    char                        *http_scheme;
-    char                        *http_host;
-    char                        *http_username;
-    char                        *http_password;
-    char                        *http_path;
-    char                        *http_query;
-    char                        *http_farg;
-    char                        *http_cert_pem;
-    uint16_t                    http_port;
-} http_connect_params_t;
 
 
 

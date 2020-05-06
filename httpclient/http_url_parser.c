@@ -2,13 +2,14 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-03 20:39:06
- * @LastEditTime: 2020-05-03 23:00:35
+ * @LastEditTime: 2020-05-06 09:08:03
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
 #include <http_log.h>
 #include <http_error.h>
 #include <http_utils.h>
+#include <http_parser.h>
 #include <http_url_parser.h>
 #include <platform_memory.h>
 
