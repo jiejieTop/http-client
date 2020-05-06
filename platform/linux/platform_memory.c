@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-14 22:02:07
- * @LastEditTime: 2020-05-05 16:43:10
+ * @LastEditTime: 2020-05-06 16:36:48
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_memory.h"
@@ -19,7 +19,6 @@ void *platform_memory_calloc(size_t num, size_t size)
 
 void *platform_memory_realloc(void *ptr, size_t size)
 {
-    printf("---------------\n");
     if (NULL == ptr) 
         return malloc(size);
     else 
