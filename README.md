@@ -35,6 +35,35 @@
 - [HTTP请求](./docs/request.md)
 
 
+## 参与开发
+
+- 平台：任何**linux**平台，目前先暂时开发linux平台的，后续适配其他平台。
+
+### 安装cmake
+
+```bash
+sudo apt-get install -y cmake
+```
+
+### 编译
+
+编写好相关的功能后进行编译并测试，**main**函数入口在[./test/test.c](./test/test.c)。
+
+```bash
+./build.sh
+```
+
+产生的可执行文件在 **./build/bin/http-client** 路径下。
+
+### 运行
+
+```bash
+ ./build/bin/http-client
+```
+
+观察测试结果，满足要求后提交`PR`。
+
+[如何提交PR？](./docs/how_to_pr.md)
 
 
 
