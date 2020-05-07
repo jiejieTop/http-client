@@ -59,7 +59,10 @@ typedef enum http_request_header {
     HTTP_REQUEST_HEADER_RANGE,
     HTTP_REQUEST_HEADER_REFERER,
     HTTP_REQUEST_HEADER_TE,
-    HTTP_REQUEST_HEADER_USER_AGENT
+    HTTP_REQUEST_HEADER_USER_AGENT,
+    HTTP_REQUEST_HEADER_ALLOW,
+    HTTP_REQUEST_HEADER_CONTENT_LENGTH,
+    HTTP_REQUEST_HEADER_CONTENT_TYPE
 } http_request_header_t;
 ```
 
@@ -95,7 +98,10 @@ static const char *HTTP_REQUEST_HEADERS_MAPPING[] = {
     "Range: ",
     "Referer: ",
     "TE: ",
-    "User-Agent: "
+    "User-Agent: ",
+    "Allow: ",
+    "Content-Length: ",
+    "Content-Type: "
 };
 ```
 
@@ -117,8 +123,9 @@ typedef struct http_request_message {
 
 ```c
 typedef struct http_request {
-    http_request_method_t           http_method;
+    http_request_method_t           method;
     http_request_message_t          req_msg;
+    uint32_t                        header_index;
     union {
         uint32_t                    flag;
         struct {
@@ -138,6 +145,26 @@ typedef struct http_request {
 int http_request_init(http_request_t *req)
 ```
 
+- http请求报文头部字段初始化，设置请求头部索引`header_index`的值为0，主要填充默认的头部字段，比如默认的长连接`Connection: Keep-Alive`，接受的数据类型`Accept: */* `等。
+
+```c
+int http_request_header_init(http_request_t *req)
+```
+
+- 设置HTTP协议版本、请求方法、指定为非长连接等
+
+```c
+int http_request_set_version(http_request_t *req, const char *str)
+```
+
+```c
+int http_request_set_method(http_request_t *req,  http_request_method_t method)
+```
+
+```c
+int http_request_no_keep_alive(http_request_t *req)
+```
+
 - 构造请求起始行，传入请求的方法、路径。
 
 ```c
@@ -150,11 +177,57 @@ int http_request_start_line(http_request_t *req,  http_request_method_t method, 
 void http_request_add_header(http_request_t *req, const char *key, const char *value)
 ```
 
-- 通过索引的方式添加请求头部的`value`字段。
+- 通过索引的方式添加请求头部的`value`字段，如果存在则不会添加。
 
 ```c
 void http_request_add_header_form_index(http_request_t *req, http_request_header_t header, const char *value)
 ```
+
+- 通过**key**或者**索引**获取头部字段的内容
+
+```c
+char *http_request_get_header(http_request_t *req, const char *key)
+```
+
+```c
+char *http_request_get_header_form_index(http_request_t *req, http_request_header_t index)
+```
+
+- 设置请求报文的主体部分，此操作会填充请求头部的`Content-Length:`字段。
+
+```c
+int http_request_set_body(http_request_t *req, const char *buf, size_t size)
+```
+
+- 获取请求报文各个字段的数据，起始行、首部、主体。
+
+```c
+char *http_request_get_start_line_data(http_request_t *req)
+```
+
+```c
+char *http_request_get_header_data(http_request_t *req)
+```
+
+```c
+char *http_request_get_body_data(http_request_t *req)
+```
+
+- 打印请求报文各个字段的数据，起始行、首部、主体。
+
+```c
+char *http_request_print_start_line(http_request_t *req)
+```
+
+```c
+char *http_request_print_header(http_request_t *req)
+```
+
+```c
+char *http_request_print_body(http_request_t *req)
+```
+
+
 
 **上一篇**：[HTTP报文处理](./message_buffer.md)
 
