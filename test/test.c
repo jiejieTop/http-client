@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-05 21:47:47
+ * @LastEditTime: 2020-05-07 19:16:05
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -27,31 +27,29 @@ int main(void)
 
     http_log_init();
 
-    HTTP_LOG_I("url:%s", URL);
+    // HTTP_LOG_I("url:%s", URL);
     
     http_url_parsing(&interceptor.connect_params, URL);
 
-    HTTP_LOG_I("host:%s", interceptor.connect_params.http_host);
-    HTTP_LOG_I("port:%d", interceptor.connect_params.http_port);
-    HTTP_LOG_I("scheme:%s", interceptor.connect_params.http_scheme);
-    HTTP_LOG_I("username:%s", interceptor.connect_params.http_username);
-    HTTP_LOG_I("password:%s", interceptor.connect_params.http_password);
-    HTTP_LOG_I("path:%s", interceptor.connect_params.http_path);
-    HTTP_LOG_I("query:%s", interceptor.connect_params.http_query);
-    HTTP_LOG_I("farg:%s\n", interceptor.connect_params.http_farg);
+    // HTTP_LOG_I("host:%s", http_get_connect_params_host(&interceptor.connect_params));
+    // HTTP_LOG_I("port:%d", http_get_connect_params_port(&interceptor.connect_params));
+    // HTTP_LOG_I("scheme:%s", http_get_connect_params_scheme(&interceptor.connect_params));
+    // HTTP_LOG_I("user:%s", http_get_connect_params_user(&interceptor.connect_params));
+    // HTTP_LOG_I("password:%s", http_get_connect_params_password(&interceptor.connect_params));
+    // HTTP_LOG_I("path:%s", http_get_connect_params_path(&interceptor.connect_params));
+    // HTTP_LOG_I("query:%s", http_get_connect_params_query(&interceptor.connect_params));
+    // HTTP_LOG_I("farg:%s\n", http_get_connect_params_farg(&interceptor.connect_params));
 
-    // http_url_parsing(&interceptor.connect_params, URL1);
+    http_request_init(&interceptor.request);
+    http_request_header_init(&interceptor.request);
+    http_request_add_header_form_index(&interceptor.request, HTTP_REQUEST_HEADER_HOST, http_get_connect_params_host(&interceptor.connect_params));
+    // http_request_set_version(&interceptor.request, "HTTP/2.0");
+    HTTP_LOG_I("head:%s", http_request_get_header_form_index(&interceptor.request, HTTP_REQUEST_HEADER_HOST));
+    http_request_set_method(&interceptor.request, HTTP_REQUEST_METHOD_GET);
+    http_request_start_line(&interceptor.request, interceptor.connect_params.http_path);
+    http_request_print_start_line(&interceptor.request);
+    http_request_print_header(&interceptor.request);
 
-    // HTTP_LOG_I("host:%s", interceptor.connect_params.http_host);
-    // HTTP_LOG_I("port:%d", interceptor.connect_params.http_port);
-    // HTTP_LOG_I("scheme:%s", interceptor.connect_params.http_scheme);
-    // HTTP_LOG_I("username:%s", interceptor.connect_params.http_username);
-    // HTTP_LOG_I("password:%s", interceptor.connect_params.http_password);
-    // HTTP_LOG_I("path:%s", interceptor.connect_params.http_path);
-    // HTTP_LOG_I("query:%s", interceptor.connect_params.http_query);
-    // HTTP_LOG_I("farg:%s\n", interceptor.connect_params.http_farg);
-
-    http_request_start_line(&interceptor.request, HTTP_REQUEST_METHOD_GET, interceptor.connect_params.http_path);
     
     sleep(2);
 

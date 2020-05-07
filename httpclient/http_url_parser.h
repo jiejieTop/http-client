@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-03 20:39:06
- * @LastEditTime: 2020-05-06 09:07:33
+ * @LastEditTime: 2020-05-07 09:20:37
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_URL_PARSER_H_
@@ -17,7 +17,7 @@ typedef struct http_connect_params {
     char                        *http_url;
     char                        *http_scheme;
     char                        *http_host;
-    char                        *http_username;
+    char                        *http_user;
     char                        *http_password;
     char                        *http_path;
     char                        *http_query;

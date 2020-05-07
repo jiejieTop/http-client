@@ -2,11 +2,13 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:21:58
- * @LastEditTime: 2020-05-06 09:29:09
+ * @LastEditTime: 2020-05-07 17:59:38
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
 #include <http_message_buffer.h>
+#include <http_log.h>
+#include <http_error.h>
 #include <platform_memory.h>
 
 /* grows for given size */
@@ -29,9 +31,20 @@ http_message_buffer_t *http_message_buffer_init(size_t size)
     buf->data = platform_memory_alloc(size);
     buf->data[0] = '\0';
     buf->length = size;
-    buf->used = 1;
+    buf->used = 1;      /* use 1 byte space in advance to prevent overflow */     
     
     return buf;
+}
+
+int http_message_buffer_reinit(http_message_buffer_t *buf)
+{
+    HTTP_ROBUSTNESS_CHECK(buf , HTTP_NULL_VALUE_ERROR);
+
+    memset(buf->data, 0, buf->length);
+    buf->data[0] = '\0';
+    buf->used = 1;
+
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 /* concatenate all given strings on to the end of the buf. the strings must all be NULL terminated */

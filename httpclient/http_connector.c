@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:36:06
- * @LastEditTime: 2020-05-06 09:06:23
+ * @LastEditTime: 2020-05-07 09:21:11
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -20,7 +20,7 @@ http_list_t _http_pending_list;
 HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(url, char*, NULL)
 HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(scheme, char*, NULL)
 HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(host, char*, NULL)
-HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(username, char*, NULL)
+HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(user, char*, NULL)
 HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(password, char*, NULL)
 HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(path, char*, NULL)
 HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(query, char*, NULL)

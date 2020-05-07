@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 00:42:16
- * @LastEditTime: 2020-05-03 16:28:27
+ * @LastEditTime: 2020-05-07 13:59:52
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_CONFIG_H_
@@ -20,7 +20,7 @@
     #define         LOG_COLOR                   (1U)
     #define         LOG_TS                      (1U)
     #define         LOG_TAR                     (0U)
-    #define         SALOF_BUFF_SIZE             (512U)
+    #define         SALOF_BUFF_SIZE             (1024*2U)
     #define         SALOF_FIFO_SIZE             (1024*4U)
     #define         SALOF_TASK_STACK_SIZE       (2048U)
     #define         SALOF_TASK_TICK             (50U)

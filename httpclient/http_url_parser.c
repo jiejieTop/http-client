@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-03 20:39:06
- * @LastEditTime: 2020-05-06 09:08:03
+ * @LastEditTime: 2020-05-07 09:30:48
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -26,7 +26,7 @@ int http_url_parsing(http_connect_params_t *connect_params, const char *url)
     memset(&u, 0, sizeof(struct http_parser_url));
 
     if (0 != http_parser_parse_url(url, strlen(url), 0, &u)) { 
-        HTTP_LOG_D("error parse url %s", url);
+        HTTP_LOG_D("error parse url : %s", url);
         RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
     }
     
@@ -39,9 +39,9 @@ int http_url_parsing(http_connect_params_t *connect_params, const char *url)
         http_utils_assign_string(&connect_params->http_scheme, url + u.field_data[UF_SCHEMA].off, u.field_data[UF_SCHEMA].len);
         HTTP_ROBUSTNESS_CHECK(connect_params->http_scheme, HTTP_MEM_NOT_ENOUGH_ERROR);
 
-        if (strcasecmp(connect_params->http_scheme, "https") == 0) {
+        if (http_utils_ignore_case_match(connect_params->http_scheme, "https") == 0) {
             connect_params->http_port = DEFAULT_HTTPS_PORT;
-        } else if(strcasecmp(connect_params->http_scheme, "http") == 0) {
+        } else if(http_utils_ignore_case_match(connect_params->http_scheme, "http") == 0) {
             connect_params->http_port = DEFAULT_HTTP_PORT;
         }
     }
@@ -59,18 +59,20 @@ int http_url_parsing(http_connect_params_t *connect_params, const char *url)
         http_utils_assign_string(&user_info, url + u.field_data[UF_USERINFO].off, u.field_data[UF_USERINFO].len);
         
         if (user_info) {
-            char *username = user_info;
+            char *user = user_info;
             char *password = strchr(user_info, ':');
 
             if (password) {
-                *password = 0;
+                *password = 0;      /* separate user from password */
                 password ++;
                 http_utils_assign_string(&connect_params->http_password, password, 0);
                 HTTP_ROBUSTNESS_CHECK(connect_params->http_password, HTTP_MEM_NOT_ENOUGH_ERROR);
             }
-            http_utils_assign_string(&connect_params->http_username, username, 0);
-            HTTP_ROBUSTNESS_CHECK(connect_params->http_username, HTTP_MEM_NOT_ENOUGH_ERROR);
+
+            http_utils_assign_string(&connect_params->http_user, user, 0);
+            HTTP_ROBUSTNESS_CHECK(connect_params->http_user, HTTP_MEM_NOT_ENOUGH_ERROR);
             
+            /* need to release temporarily allocated memory space */
             http_utils_release_string(user_info);
         } else {
             RETURN_ERROR(HTTP_MEM_NOT_ENOUGH_ERROR);

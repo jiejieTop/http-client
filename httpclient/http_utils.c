@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-03 13:35:08
- * @LastEditTime: 2020-05-05 17:36:01
+ * @LastEditTime: 2020-05-07 09:16:46
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -25,6 +25,13 @@ int _http_utils_isdigit(int x)
         return 1; 
     else 
         return 0;
+}
+
+static int _http_utils_to_lower(int c)
+{
+    if ((c >= 'A') && (c <= 'Z'))
+        return c + ('a' - 'A');
+    return c;
 }
 
 size_t http_utils_count_concat(va_list *ap)
@@ -51,6 +58,56 @@ void http_utils_concat(char *str, va_list *ap)
 	str += len;
 #endif
     }
+}
+
+int http_utils_match(const char *str1, const char *str2)
+{
+    int c1, c2;
+    do {
+        c1 = *str1++;
+        c2 = *str2++;
+    } while((c1 == c2) && c1);
+
+    return c1 - c2;
+}
+
+int http_utils_nmatch(const char *str1, const char *str2, int n)
+{
+    int i = 0;
+    int c1, c2;
+    do {
+        c1 = *str1++;
+        c2 = *str2++;
+        i++;
+    } while(((c1 == c2) && c1) && (i < n));
+
+    return c1 - c2;
+}
+
+int http_utils_ignore_case_match(const char *str1, const char *str2)
+{
+    int c1, c2;
+
+    do {
+        c1 = _http_utils_to_lower(*str1++);
+        c2 = _http_utils_to_lower(*str2++);
+    } while((c1 == c2) && c1);
+
+    return c1 - c2;
+}
+
+int http_utils_ignore_case_nmatch(const char *str1, const char *str2, int n)
+{
+    int i = 0;
+    int c1, c2;
+
+    do {
+        c1 = _http_utils_to_lower(*str1++);
+        c2 = _http_utils_to_lower(*str2++);
+        i++;
+    } while(((c1 == c2) && c1) && (i < n));
+
+    return c1 - c2;
 }
 
 

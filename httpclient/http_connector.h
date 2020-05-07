@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:36:06
- * @LastEditTime: 2020-05-05 10:47:27
+ * @LastEditTime: 2020-05-07 09:20:55
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -69,7 +69,7 @@ typedef enum http_connect_status {
 HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(url, char*)
 HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(scheme, char*)
 HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(host, char*)
-HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(username, char*)
+HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(user, char*)
 HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(password, char*)
 HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(path, char*)
 HTTP_SET_AND_GET_CONNECT_PARAMS_STATEMENT(query, char*)

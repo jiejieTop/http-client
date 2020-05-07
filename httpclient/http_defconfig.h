@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-02-25 03:36:09
- * @LastEditTime: 2020-05-05 20:29:23
+ * @LastEditTime: 2020-05-07 09:04:42
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -51,7 +51,7 @@
 
 #define HTTP_MESSAGE_BUFFER_GROWTH  64
 
-#define HTTP_VERSION_SRTING     " HTTP/"
+#define HTTP_VERSION_SRTING     "HTTP/"
 #define HTTP_VERSION_MAJOR      "1"
 #define HTTP_VERSION_MINOR      ".1"
 
