@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:42
- * @LastEditTime: 2020-05-07 19:15:26
+ * @LastEditTime: 2020-05-07 22:27:09
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_REQUEST_H_
@@ -54,7 +54,10 @@ typedef enum http_request_header {
     HTTP_REQUEST_HEADER_RANGE,
     HTTP_REQUEST_HEADER_REFERER,
     HTTP_REQUEST_HEADER_TE,
-    HTTP_REQUEST_HEADER_USER_AGENT
+    HTTP_REQUEST_HEADER_USER_AGENT,
+    HTTP_REQUEST_HEADER_ALLOW,
+    HTTP_REQUEST_HEADER_CONTENT_LENGTH,
+    HTTP_REQUEST_HEADER_CONTENT_TYPE
 } http_request_header_t;
 
 
@@ -90,10 +93,17 @@ void http_request_add_header_form_index(http_request_t *req, http_request_header
 char *http_request_get_header(http_request_t *req, const char *key);
 char *http_request_get_header_form_index(http_request_t *req, http_request_header_t index);
 
+int http_request_set_body(http_request_t *req, const char *buf, size_t size);
+
 int http_request_no_keep_alive(http_request_t *req);
 int http_request_set_version(http_request_t *req, const char *str);
 
+char *http_request_get_start_line_data(http_request_t *req);
+char *http_request_get_header_data(http_request_t *req);
+char *http_request_get_body_data(http_request_t *req);
+
 void http_request_print_start_line(http_request_t *req);
 void http_request_print_header(http_request_t *req);
+void http_request_print_body(http_request_t *req);
 
 #endif // !_HTTP_REQUEST_H_

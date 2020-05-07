@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-03 20:39:06
- * @LastEditTime: 2020-05-07 09:30:48
+ * @LastEditTime: 2020-05-07 21:51:08
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -19,13 +19,18 @@
  */
 int http_url_parsing(http_connect_params_t *connect_params, const char *url)  
 {
+    size_t len = 0;
     struct http_parser_url u;
 
     HTTP_ROBUSTNESS_CHECK((connect_params && url), HTTP_NULL_VALUE_ERROR);
 
     memset(&u, 0, sizeof(struct http_parser_url));
 
-    if (0 != http_parser_parse_url(url, strlen(url), 0, &u)) { 
+    len = strlen(url);
+
+    http_utils_assign_string(&connect_params->http_url, url, len);
+
+    if (0 != http_parser_parse_url(url, len, 0, &u)) { 
         HTTP_LOG_D("error parse url : %s", url);
         RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
     }

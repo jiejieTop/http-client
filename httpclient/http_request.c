@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:36
- * @LastEditTime: 2020-05-07 19:15:06
+ * @LastEditTime: 2020-05-07 22:26:56
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -43,7 +43,10 @@ static const char *_http_request_headers_mapping[] = {
     "Range: ",
     "Referer: ",
     "TE: ",
-    "User-Agent: "
+    "User-Agent: ",
+    "Allow: ",
+    "Content-Length: ",
+    "Content-Type: "
 };
 
 int http_request_init(http_request_t *req)
@@ -53,6 +56,8 @@ int http_request_init(http_request_t *req)
     req->req_msg.line = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
     req->req_msg.header = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
     req->req_msg.body = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
+
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 
@@ -68,7 +73,9 @@ int http_request_header_init(http_request_t *req)
     }
 
     http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Keep-Alive");
+    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_ACCEPT, "*/*");
 
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 
@@ -97,6 +104,8 @@ int http_request_set_method(http_request_t *req,  http_request_method_t method)
     HTTP_ROBUSTNESS_CHECK((req && method), HTTP_NULL_VALUE_ERROR);
 
     req->method = method;
+
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 int http_request_start_line(http_request_t *req, const char *path)
@@ -106,6 +115,8 @@ int http_request_start_line(http_request_t *req, const char *path)
     const char *m = _http_method_mapping[req->method];
     
     http_message_buffer_concat(req->req_msg.line, m, path, " ", _http_request_version, HTTP_CRLF, NULL);
+
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 /* adds a header to the request with given key and value. */
@@ -156,19 +167,56 @@ char *http_request_get_header_form_index(http_request_t *req, http_request_heade
     return http_request_get_header(req, key);
 }
 
+
+int http_request_set_body(http_request_t *req, const char *buf, size_t size)
+{
+    HTTP_ROBUSTNESS_CHECK((req && buf && size), HTTP_NULL_VALUE_ERROR);
+
+    http_message_buffer_concat(req->req_msg.body, buf, NULL);
+
+    char *str = http_utils_itoa(req->req_msg.body->used, NULL, 10);
+    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONTENT_LENGTH, str);
+    http_utils_release_string(str);
+
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
+}
+
+char *http_request_get_start_line_data(http_request_t *req)
+{
+    HTTP_ROBUSTNESS_CHECK(req, NULL);
+    return req->req_msg.line->data;
+}
+
+char *http_request_get_header_data(http_request_t *req)
+{
+    HTTP_ROBUSTNESS_CHECK(req, NULL);
+    return req->req_msg.header->data;
+}
+
+char *http_request_get_body_data(http_request_t *req)
+{
+    HTTP_ROBUSTNESS_CHECK(req, NULL);
+    return req->req_msg.body->data;
+}
+
 void http_request_print_start_line(http_request_t *req)
 {
     HTTP_ROBUSTNESS_CHECK(req, HTTP_VOID);
 
-    HTTP_LOG_I("%s:%d %s()...\n%s", __FILE__, __LINE__, __FUNCTION__, req->req_msg.line->data);
-    
+    HTTP_LOG_I("%s:%d %s()...\n\n%s", __FILE__, __LINE__, __FUNCTION__, req->req_msg.line->data);
 }
 
 void http_request_print_header(http_request_t *req)
 {
     HTTP_ROBUSTNESS_CHECK(req, HTTP_VOID);
 
-    HTTP_LOG_I("%s:%d %s()...\n%s", __FILE__, __LINE__, __FUNCTION__, req->req_msg.header->data);
-    
+    HTTP_LOG_I("%s:%d %s()...\n\n%s", __FILE__, __LINE__, __FUNCTION__, req->req_msg.header->data);
+}
+
+void http_request_print_body(http_request_t *req)
+{
+    HTTP_ROBUSTNESS_CHECK(req, HTTP_VOID);
+
+    HTTP_LOG_I("%s:%d %s()...\n\n%s", __FILE__, __LINE__, __FUNCTION__, req->req_msg.body->data);
 }
 
