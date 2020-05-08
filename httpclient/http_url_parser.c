@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-03 20:39:06
- * @LastEditTime: 2020-05-07 21:51:08
+ * @LastEditTime: 2020-05-08 14:16:06
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -40,19 +40,20 @@ int http_url_parsing(http_connect_params_t *connect_params, const char *url)
         HTTP_ROBUSTNESS_CHECK(connect_params->http_host, HTTP_MEM_NOT_ENOUGH_ERROR)
     }
 
+    if(u.field_data[UF_PORT].len) { 
+        http_utils_assign_string(&connect_params->http_port, url + u.field_data[UF_PORT].off, u.field_data[UF_PORT].len);
+        HTTP_ROBUSTNESS_CHECK(connect_params->http_host, HTTP_MEM_NOT_ENOUGH_ERROR)
+    }
+    
     if (u.field_data[UF_SCHEMA].len) {
         http_utils_assign_string(&connect_params->http_scheme, url + u.field_data[UF_SCHEMA].off, u.field_data[UF_SCHEMA].len);
         HTTP_ROBUSTNESS_CHECK(connect_params->http_scheme, HTTP_MEM_NOT_ENOUGH_ERROR);
 
-        if (http_utils_ignore_case_match(connect_params->http_scheme, "https") == 0) {
+        if ((NULL == connect_params->http_port) && (http_utils_ignore_case_match(connect_params->http_scheme, "https") == 0)) {
             connect_params->http_port = DEFAULT_HTTPS_PORT;
-        } else if(http_utils_ignore_case_match(connect_params->http_scheme, "http") == 0) {
+        } else if((NULL == connect_params->http_port) && (http_utils_ignore_case_match(connect_params->http_scheme, "http") == 0)) {
             connect_params->http_port = DEFAULT_HTTP_PORT;
         }
-    }
-
-    if(u.field_set & (1 << UF_PORT)) { 
-        connect_params->http_port = u.port;  
     }
 
     if (0 == connect_params->http_port) {

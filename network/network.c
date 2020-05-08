@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:30:54
- * @LastEditTime: 2020-02-25 03:49:43
+ * @LastEditTime: 2020-05-08 22:34:16
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_timer.h"
@@ -88,5 +88,15 @@ void network_release(network_t* n)
 		network_disconnect(n);
 
 	memset(n, 0, sizeof(network_t));
+}
+
+
+int network_set_addr_port(network_t* n, char *addr, char *port)
+{
+	if (!(n && addr && port))
+		RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
+	
+	n->network_params.addr = addr;
+	n->network_params.port = port;
 }
 

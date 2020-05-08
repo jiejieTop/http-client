@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:36
- * @LastEditTime: 2020-05-07 22:26:56
+ * @LastEditTime: 2020-05-08 22:39:56
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -108,13 +108,24 @@ int http_request_set_method(http_request_t *req,  http_request_method_t method)
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
-int http_request_start_line(http_request_t *req, const char *path)
+int http_request_set_start_line(http_request_t *req, const char *path)
 {
     HTTP_ROBUSTNESS_CHECK((req && path), HTTP_NULL_VALUE_ERROR);
     
     const char *m = _http_method_mapping[req->method];
     
     http_message_buffer_concat(req->req_msg.line, m, path, " ", _http_request_version, HTTP_CRLF, NULL);
+
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
+}
+
+int http_request_set_start_line_with_query(http_request_t *req, const char *path, const char *query)
+{
+    HTTP_ROBUSTNESS_CHECK((req && path && query), HTTP_NULL_VALUE_ERROR);
+    
+    const char *m = _http_method_mapping[req->method];
+    
+    http_message_buffer_concat(req->req_msg.line, m, path, "?", query, " ", _http_request_version, HTTP_CRLF, NULL);
 
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
@@ -172,7 +183,7 @@ int http_request_set_body(http_request_t *req, const char *buf, size_t size)
 {
     HTTP_ROBUSTNESS_CHECK((req && buf && size), HTTP_NULL_VALUE_ERROR);
 
-    http_message_buffer_concat(req->req_msg.body, buf, NULL);
+    http_message_buffer_concat(req->req_msg.body, buf, HTTP_CRLF, NULL);
 
     char *str = http_utils_itoa(req->req_msg.body->used, NULL, 10);
     http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONTENT_LENGTH, str);
@@ -197,6 +208,24 @@ char *http_request_get_body_data(http_request_t *req)
 {
     HTTP_ROBUSTNESS_CHECK(req, NULL);
     return req->req_msg.body->data;
+}
+
+size_t http_request_get_start_line_length(http_request_t *req)
+{
+    HTTP_ROBUSTNESS_CHECK(req, 0);
+    return req->req_msg.line->length;
+}
+
+size_t http_request_get_header_length(http_request_t *req)
+{
+    HTTP_ROBUSTNESS_CHECK(req, 0);
+    return req->req_msg.header->length;
+}
+
+size_t http_request_get_body_length(http_request_t *req)
+{
+    HTTP_ROBUSTNESS_CHECK(req, 0);
+    return req->req_msg.body->length;
 }
 
 void http_request_print_start_line(http_request_t *req)

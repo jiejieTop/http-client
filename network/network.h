@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:02
- * @LastEditTime: 2020-02-25 03:49:11
+ * @LastEditTime: 2020-05-08 22:34:32
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _NETWORK_H_
@@ -47,6 +47,7 @@ typedef struct network {
 } network_t;
 
 int network_init(network_t* n, network_params_t* network_params);
+int network_set_addr_port(network_t* n, char *addr, char *port);
 int network_read(network_t* n, unsigned char* buf, int len, int timeout);
 int network_write(network_t* n, unsigned char* buf, int len, int timeout);
 int network_connect(network_t* n);
