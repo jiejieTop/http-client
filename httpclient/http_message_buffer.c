@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:21:58
- * @LastEditTime: 2020-05-09 15:55:26
+ * @LastEditTime: 2020-05-10 01:24:05
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -54,10 +54,14 @@ void http_message_buffer_release(http_message_buffer_t *buf)
 {
     HTTP_ROBUSTNESS_CHECK(buf, HTTP_VOID);
 
-    platform_memory_free((void*)buf->data);
+    if (0 != buf->length) {
+        buf->length = 0;
+        platform_memory_free((void*)buf->data);
+    }
+        
     buf->data = NULL;
-    buf->length = 0;
     buf->used = 0;
+    
     platform_memory_free((void*)buf);
     buf = NULL;
 }
@@ -115,6 +119,9 @@ void http_message_buffer_cover(http_message_buffer_t *buf, ...)
 int http_message_buffer_pointer(http_message_buffer_t *buf, const char *str, size_t len)
 {
     HTTP_ROBUSTNESS_CHECK((buf && str && len), HTTP_NULL_VALUE_ERROR);
+
+    platform_memory_free(buf->data);
+    buf->length = 0;
 
     buf->data = (char*)str;
     buf->used += len;
