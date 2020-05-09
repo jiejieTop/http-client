@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:36
- * @LastEditTime: 2020-05-08 22:39:56
+ * @LastEditTime: 2020-05-09 21:28:12
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -72,8 +72,9 @@ int http_request_header_init(http_request_t *req)
         http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Close");
     }
 
-    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Keep-Alive");
+    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Close");
     http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_ACCEPT, "*/*");
+    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_USER_AGENT, "http-client-by-jiejie");
 
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
@@ -184,6 +185,19 @@ int http_request_set_body(http_request_t *req, const char *buf, size_t size)
     HTTP_ROBUSTNESS_CHECK((req && buf && size), HTTP_NULL_VALUE_ERROR);
 
     http_message_buffer_concat(req->req_msg.body, buf, HTTP_CRLF, NULL);
+
+    char *str = http_utils_itoa(req->req_msg.body->used, NULL, 10);
+    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONTENT_LENGTH, str);
+    http_utils_release_string(str);
+
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
+}
+
+int http_request_set_body_form_pointer(http_request_t *req, const char *buf, size_t size)
+{
+    HTTP_ROBUSTNESS_CHECK((req && buf && size), HTTP_NULL_VALUE_ERROR);
+
+    http_message_buffer_pointer(req->req_msg.body, buf, size);
 
     char *str = http_utils_itoa(req->req_msg.body->used, NULL, 10);
     http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONTENT_LENGTH, str);

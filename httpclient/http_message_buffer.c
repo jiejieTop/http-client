@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:21:58
- * @LastEditTime: 2020-05-07 20:57:01
+ * @LastEditTime: 2020-05-09 15:55:26
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -12,7 +12,7 @@
 #include <platform_memory.h>
 
 /* grows for given size */
-void _http_message_buffer_grow(http_message_buffer_t *buf, size_t newsize) 
+void http_message_buffer_grow(http_message_buffer_t *buf, size_t newsize)
 {
     if (newsize > buf->length) {
         /* if it's not big enough already... */
@@ -26,7 +26,10 @@ http_message_buffer_t *http_message_buffer_init(size_t size)
 {
     http_message_buffer_t *buf;
 
-    buf = platform_memory_alloc(sizeof(*buf));
+    if (0 == size)
+        size = HTTP_MESSAGE_BUFFER_GROWTH;
+
+    buf = (http_message_buffer_t *)platform_memory_alloc(sizeof(*buf));
     
     buf->data = platform_memory_alloc(size);
     buf->data[0] = '\0';
@@ -38,13 +41,25 @@ http_message_buffer_t *http_message_buffer_init(size_t size)
 
 int http_message_buffer_reinit(http_message_buffer_t *buf)
 {
-    HTTP_ROBUSTNESS_CHECK(buf , HTTP_NULL_VALUE_ERROR);
+    HTTP_ROBUSTNESS_CHECK(buf, HTTP_NULL_VALUE_ERROR);
 
     memset(buf->data, 0, buf->length);
     buf->data[0] = '\0';
     buf->used = 1;
 
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
+}
+
+void http_message_buffer_release(http_message_buffer_t *buf)
+{
+    HTTP_ROBUSTNESS_CHECK(buf, HTTP_VOID);
+
+    platform_memory_free((void*)buf->data);
+    buf->data = NULL;
+    buf->length = 0;
+    buf->used = 0;
+    platform_memory_free((void*)buf);
+    buf = NULL;
 }
 
 /* concatenate all given strings on to the end of the buf. the strings must all be NULL terminated */
@@ -58,7 +73,7 @@ void http_message_buffer_concat(http_message_buffer_t *buf, ...)
     va_end(ap);    
 
     /* grow the buffer */
-    _http_message_buffer_grow(buf, total);
+    http_message_buffer_grow(buf, total);
     
     va_start(ap, buf);    
     http_utils_concat(buf->data + buf->used - 1, &ap);
@@ -70,10 +85,40 @@ void http_message_buffer_concat(http_message_buffer_t *buf, ...)
 
 void http_message_buffer_append(http_message_buffer_t *buf, const char *str, size_t len) 
 {
-    _http_message_buffer_grow(buf, buf->used + len);
+    http_message_buffer_grow(buf, buf->used + len);
     memcpy(buf->data + buf->used - 1, str, len);
     buf->used += len;
     buf->data[buf->used - 1] = '\0';
 }
 
+
+void http_message_buffer_cover(http_message_buffer_t *buf, ...)
+{
+    va_list ap;
+    ssize_t total;
+
+    va_start(ap, buf);
+    total = 1 + http_utils_count_concat(&ap);
+    va_end(ap);    
+
+    /* grow the buffer */
+    http_message_buffer_grow(buf, total);
+    
+    va_start(ap, buf);    
+    http_utils_concat(buf->data, &ap);
+    va_end(ap); 
+    
+    buf->used = total;
+    buf->data[total - 1] = '\0';
+}
+
+int http_message_buffer_pointer(http_message_buffer_t *buf, const char *str, size_t len)
+{
+    HTTP_ROBUSTNESS_CHECK((buf && str && len), HTTP_NULL_VALUE_ERROR);
+
+    buf->data = (char*)str;
+    buf->used += len;
+
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
+}
 

@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:22:22
- * @LastEditTime: 2020-05-07 14:26:15
+ * @LastEditTime: 2020-05-09 15:55:07
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -21,7 +21,11 @@ typedef struct http_message_buffer {
 
 http_message_buffer_t *http_message_buffer_init(size_t size);
 int http_message_buffer_reinit(http_message_buffer_t *buf);
+void http_message_buffer_grow(http_message_buffer_t *buf, size_t newsize);
+void http_message_buffer_release(http_message_buffer_t *buf);
 void http_message_buffer_concat(http_message_buffer_t *buf, ...);
+void http_message_buffer_cover(http_message_buffer_t *buf, ...);
 void http_message_buffer_append(http_message_buffer_t *buf, const char *str, size_t len);
+int http_message_buffer_pointer(http_message_buffer_t *buf, const char *str, size_t len);
 
 #endif // !_HTTP_MESSAGE_BUFFER_H_

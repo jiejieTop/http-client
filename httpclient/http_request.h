@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:42
- * @LastEditTime: 2020-05-08 22:38:37
+ * @LastEditTime: 2020-05-09 15:19:20
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_REQUEST_H_
@@ -95,6 +95,7 @@ char *http_request_get_header(http_request_t *req, const char *key);
 char *http_request_get_header_form_index(http_request_t *req, http_request_header_t index);
 
 int http_request_set_body(http_request_t *req, const char *buf, size_t size);
+int http_request_set_body_form_pointer(http_request_t *req, const char *buf, size_t size);
 
 int http_request_no_keep_alive(http_request_t *req);
 int http_request_set_version(http_request_t *req, const char *str);
