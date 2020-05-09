@@ -44,6 +44,15 @@ int http_utils_atoi(const char *nptr)
 char *http_utils_itoa(int value, char *string, int radix)
 ```
 
+- 匹配字符串操作，指定匹配的字符串长度、支持忽略大小写等。
+
+```c
+int http_utils_match(const char *str1, const char *str2)
+int http_utils_nmatch(const char *str1, const char *str2, int n)
+int http_utils_ignore_case_match(const char *str1, const char *str2)
+int http_utils_ignore_case_nmatch(const char *str1, const char *str2, int n)
+```
+
 
 ## 宏定义
 

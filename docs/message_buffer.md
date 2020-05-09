@@ -15,16 +15,35 @@ typedef struct http_message_buffer {
 
 ## 外部函数
 
-- 初始化报文并分配默认的内存空间`HTTP_MESSAGE_BUFFER_GROWTH`，该宏在`http_defconfig.h`被定义，可由用户修改。
+- 初始化报文并分配指定大小size的内存空间，如果不指定（size为0）则分配默认的内存空间`HTTP_MESSAGE_BUFFER_GROWTH`，该宏在`http_defconfig.h`被定义，可由用户修改。
 
 ```c
 http_message_buffer_t *http_message_buffer_init(size_t size)
 ```
 
+- 报文重新初始化，清除报文的data字段内容
+
+```c
+int http_message_buffer_reinit(http_message_buffer_t *buf)
+```
+
+- 释放报文，此操作会释放报文的data字段的内存空间，还会释放报文本身的内存空间（如果该报文是通过**http_message_buffer_init()**函数得到的）。
+
+```c
+void http_message_buffer_release(http_message_buffer_t *buf)
+```
+
+
 - 将字符串连接到报文中，可变参数，字符串必须以`NULL`结束，自动处理内存不足的问题，增长的内存大小是`HTTP_MESSAGE_BUFFER_GROWTH`的倍数。
 
 ```c
 void http_message_buffer_concat(http_message_buffer_t *buf, ...)
+```
+
+- 通过**覆盖写入**的方式将数据写入到报文中，参数可变，字符串必须以`NULL`结束，会自动处理内存不足的问题。
+
+```c
+void http_message_buffer_cover(http_message_buffer_t *buf, ...)
 ```
 
 - 追加指定的`str`字符串数据到报文中，`len`是追加的字符串长度，可自动处理内存不足的问题。
@@ -33,12 +52,17 @@ void http_message_buffer_concat(http_message_buffer_t *buf, ...)
 void http_message_buffer_append(http_message_buffer_t *buf, const char *str, size_t len
 ```
 
-## 内部函数
+- 通过指针引用的方式去引用指定的数据。
+
+```c
+int http_message_buffer_pointer(http_message_buffer_t *buf, const char *str, size_t len)
+```
+
 
 - 给buf增长内存空间，增长的内存大小是`HTTP_MESSAGE_BUFFER_GROWTH`的倍数。当buf的剩余空间不足以存放指定`newsize`大小的数据时，自动分配内存。
 
 ```c
-void _http_message_buffer_grow(http_message_buffer_t *buf, size_t newsize)
+void http_message_buffer_grow(http_message_buffer_t *buf, size_t newsize)
 ```
 
 ## 依赖

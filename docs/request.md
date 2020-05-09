@@ -171,6 +171,12 @@ int http_request_no_keep_alive(http_request_t *req)
 int http_request_start_line(http_request_t *req,  http_request_method_t method, const char *path)
 ```
 
+- 构造请求起始行，传入请求的方法、路径、查询参数等。
+
+```c
+int http_request_set_start_line_with_query(http_request_t *req, const char *path, const char *query)
+```
+
 - 添加请求头部的内容，指定`key： value`，`key`字段内容可参考[HTTP RFC](https://tools.ietf.org/html/rfc2616#section-4.2)，也可参考`HTTP_REQUEST_HEADERS_MAPPING`数组的内容。
 
 ```c
@@ -199,6 +205,12 @@ char *http_request_get_header_form_index(http_request_t *req, http_request_heade
 int http_request_set_body(http_request_t *req, const char *buf, size_t size)
 ```
 
+- 通过指针引用的方式设置报文主体部分，此操作是为了避免占用太大的内存消耗，而且会填充请求头部的`Content-Length:`字段。
+
+```c
+int http_request_set_body_form_pointer(http_request_t *req, const char *buf, size_t size)
+```
+
 - 获取请求报文各个字段的数据，起始行、首部、主体。
 
 ```c
@@ -211,6 +223,20 @@ char *http_request_get_header_data(http_request_t *req)
 
 ```c
 char *http_request_get_body_data(http_request_t *req)
+```
+
+- 获取请求报文各个字段的数据，起始行、首部、主体的长度。
+
+```c
+size_t http_request_get_start_line_length(http_request_t *req)
+```
+
+```c
+size_t http_request_get_header_length(http_request_t *req)
+```
+
+```c
+size_t http_request_get_body_length(http_request_t *req)
 ```
 
 - 打印请求报文各个字段的数据，起始行、首部、主体。

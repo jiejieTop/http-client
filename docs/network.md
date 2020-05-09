@@ -65,6 +65,12 @@ int network_init(network_t* n, network_params_t* network_params)
 
 - 从底层读数据，指定数据存储区域`buf`、数据长度`len`、读超时的时间`timeout`。
 
+- network设置目标主机地址与端口号。
+
+```c
+int network_set_addr_port(network_t* n, char *addr, char *port)
+```
+
 ```c
 int network_read(network_t* n, unsigned char* buf, int len, int timeout)
 ```
