@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-09 21:48:48
+ * @LastEditTime: 2020-05-10 21:34:05
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -21,6 +21,7 @@ typedef enum http_interceptor_status {
     http_interceptor_status_connect,
     http_interceptor_status_request,
     http_interceptor_status_response_headers,
+    http_interceptor_status_headers_complete,
     http_interceptor_status_response_body,
     http_interceptor_status_close
 } http_interceptor_status_t;
@@ -36,7 +37,18 @@ typedef struct http_interceptor {
     uint16_t                    cmd_timeout;
     struct http_parser          *parser;
     struct http_parser_settings *parser_settings;
-    uint16_t                    process_again;
+    union {
+        uint32_t                all_flag;
+        struct {
+            uint32_t again              : 4;
+            uint32_t redirects          : 4;
+            uint32_t retry              : 4;
+            uint32_t authenticate       : 4;
+            uint32_t chunked            : 4;
+            uint32_t chunked_complete   : 4;
+            uint32_t close              : 8;
+        } flag_t;
+    } flag;
 } http_interceptor_t;
 
 

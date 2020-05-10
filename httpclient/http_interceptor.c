@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-09 21:55:13
+ * @LastEditTime: 2020-05-11 00:56:52
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -19,10 +19,14 @@
 
 static int _http_read_buffer(http_interceptor_t *interceptor, http_message_buffer_t *buf, int length)
 {
+    int len = 0;
     int read_len = 0;
 
     platform_timer_t timer;
-    HTTP_ROBUSTNESS_CHECK((interceptor && buf && length), HTTP_NULL_VALUE_ERROR);
+    HTTP_ROBUSTNESS_CHECK((interceptor && buf), HTTP_NULL_VALUE_ERROR);
+
+    if ((0 == length) || (length > interceptor->message->length))
+        length = interceptor->message->length;
 
     platform_timer_init(&timer);
     platform_timer_cutdown(&timer, interceptor->cmd_timeout);
@@ -32,16 +36,18 @@ static int _http_read_buffer(http_interceptor_t *interceptor, http_message_buffe
     do {
         memset(interceptor->message->data, 0, length);
         
-        read_len = network_read(interceptor->network, 
-                                interceptor->message->data, 
-                                length,
-                                platform_timer_remain(&timer));
+        len = network_read( interceptor->network, 
+                            interceptor->message->data, 
+                            length,
+                            platform_timer_remain(&timer));
 
         http_message_buffer_concat(buf, interceptor->message->data, NULL);
 
-    } while (read_len > 0); 
+        read_len += len;
+
+    } while (len == length);    /* read again, there may be data */
     
-    RETURN_ERROR(HTTP_SUCCESS_ERROR);
+    RETURN_ERROR(read_len);
 }
 
 static int _http_write_buffer(http_interceptor_t *interceptor, unsigned char *buf, int length)
@@ -106,18 +112,162 @@ static int _http_interceptor_set_network(http_interceptor_t *interceptor)
     RETURN_ERROR(res);
 }
 
+static int _http_on_url(http_parser *parser, const char *at, size_t length)
+{
+    HTTP_LOG_D("_http_on_url");
+    return 0;
+}
+
+static int _http_on_status(http_parser *parser, const char *at, size_t length)
+{
+    HTTP_LOG_D("_http_on_status：%d\n", parser->status_code);
+    return 0;
+}
+
+static int _http_on_header_field(http_parser *parser, const char *at, size_t length)
+{
+    http_interceptor_t *interceptor = parser->data;
+    printf("Header field: %.*s\n", (int)length, at);
+
+
+    if(0 == http_utils_ignore_case_nmatch(at, "Location", 8)) {
+        interceptor->flag.flag_t.redirects = 1;
+        //  interceptor->flag.flag_t.again = 1;
+    } else if(0 == http_utils_ignore_case_nmatch(at, "Transfer-Encoding", 17)) {
+        interceptor->flag.flag_t.chunked = 1;
+    } else if(0 == http_utils_ignore_case_nmatch(at, "WWW-Authenticate", 16)) {
+        interceptor->flag.flag_t.authenticate = 1;
+        interceptor->flag.flag_t.again = 1;
+    }
+    
+    // printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> %d\n", interceptor->flag.all_flag);
+
+    // http_utils_assign_string(&client->current_header_key, at, length);
+    return 0;
+}
+
+static int _http_on_header_value(http_parser *parser, const char *at, size_t length)
+{
+    http_interceptor_t *interceptor = parser->data;
+
+    if (0 != interceptor->flag.flag_t.redirects) {
+        printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> %d\n", interceptor->flag.all_flag);
+        interceptor->flag.flag_t.redirects = 0;
+    }
+
+    printf("Header value:%.*s\n", (int)length, at);
+    return 0;
+}
+
+static int _http_on_headers_complete(http_parser *parser)
+{
+    http_interceptor_t *interceptor = parser->data;
+
+    http_response_set_status(&interceptor->response, parser->status_code);
+    http_response_set_offset(&interceptor->response, parser->nread);
+    http_response_set_length(&interceptor->response, parser->content_length);
+
+    HTTP_LOG_D("_http_on_headers_complete, status=%d, offset=%d, nread=%d", parser->status_code, interceptor->response.offset, parser->nread);
+
+    _http_interceptor_set_status(interceptor, http_interceptor_status_headers_complete);
+    return 0;
+}
+
+static int _http_on_message_begin(http_parser *parser)
+{
+    http_interceptor_t *interceptor = parser->data;
+    HTTP_LOG_D("_http_on_message_begin");
+
+    // client->response->is_chunked = false;
+    // client->is_chunk_complete = false;
+    return 0;
+}
+
+static int _http_on_message_complete(http_parser *parser)
+{
+    http_interceptor_t *interceptor = parser->data;
+
+    HTTP_LOG_D("_http_on_message_complete");
+
+    if (0!= interceptor->flag.flag_t.chunked)
+        interceptor->flag.flag_t.chunked_complete = 1;
+
+    return 0;
+}
+
+static int _http_on_body(http_parser *parser, const char *at, size_t length)
+{
+    http_interceptor_t *interceptor = parser->data;
+
+    HTTP_LOG_D("Body len: %d, %s\n", (int)length, at);
+
+    return 0;
+}
+
+static int _http_on_chunk_header(http_parser *parser)
+{
+    HTTP_LOG_D("_http_on_chunk_header");
+    return 0;
+}
+
+static int _http_on_chunk_complete(http_parser *parser)
+{
+    HTTP_LOG_D("_http_on_chunk_complete");
+    return 0;
+}
+
+static int _http_interceptor_parser_setting(http_interceptor_t *interceptor)
+{
+    interceptor->parser_settings->on_url = _http_on_url;
+    interceptor->parser_settings->on_status = _http_on_status;
+    interceptor->parser_settings->on_header_field = _http_on_header_field;
+    interceptor->parser_settings->on_header_value = _http_on_header_value;
+    interceptor->parser_settings->on_headers_complete = _http_on_headers_complete;
+    interceptor->parser_settings->on_message_begin = _http_on_message_begin;
+    interceptor->parser_settings->on_message_complete = _http_on_message_complete;
+    interceptor->parser_settings->on_body = _http_on_body;
+    interceptor->parser_settings->on_chunk_header = _http_on_chunk_header;
+    interceptor->parser_settings->on_chunk_complete = _http_on_chunk_complete;
+    interceptor->parser->data = interceptor;
+}
+
 static int _http_interceptor_prepare(http_interceptor_t *interceptor)
 {
     HTTP_ROBUSTNESS_CHECK(interceptor, HTTP_NULL_VALUE_ERROR);
 
     if (NULL == interceptor->parser)
         interceptor->parser = platform_memory_alloc(sizeof(struct http_parser));
+
+    if (NULL == interceptor->parser_settings)
+        interceptor->parser_settings = platform_memory_alloc(sizeof(struct http_parser_settings));
     
-    HTTP_ROBUSTNESS_CHECK(interceptor->parser, HTTP_MEM_NOT_ENOUGH_ERROR);
+    HTTP_ROBUSTNESS_CHECK((interceptor->parser && interceptor->parser_settings), HTTP_MEM_NOT_ENOUGH_ERROR);
 
     http_parser_init(interceptor->parser, HTTP_RESPONSE);
+    _http_interceptor_parser_setting(interceptor);
 
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
+}
+
+int http_interceptor_check_response(http_interceptor_t *interceptor)
+{
+    http_response_status_t status;
+    status = http_response_get_status(&interceptor->response);
+
+    switch (status) {
+        case http_response_status_moved_permanently:
+        case http_response_status_found:
+        case http_response_status_see_ther:
+        case http_response_status_not_modified:
+        case http_response_status_use_proxy:
+        case http_response_status_unused:
+        case http_response_status_temporary_redirect:
+            // http_url_parsing(interceptor->connect_params, )
+            break;
+
+        default:
+            break;
+    }
 }
 
 
@@ -147,6 +297,8 @@ int http_interceptor_set_connect_params(http_interceptor_t *interceptor, http_co
     HTTP_ROBUSTNESS_CHECK((interceptor && conn_param), HTTP_NULL_VALUE_ERROR);
 
     interceptor->connect_params = conn_param;
+
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 int http_interceptor_connect(http_interceptor_t *interceptor)
@@ -218,15 +370,29 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
     // HTTP_LOG_D("len:%ld\ndata:%s",interceptor->write_buf->used, interceptor->write_buf->data);
     res = _http_write_buffer(interceptor, interceptor->message->data, interceptor->message->used);
     
-    _http_read_buffer(interceptor, interceptor->response.message, HTTP_DEFAULT_BUF_SIZE);
-
-    printf("%s\n", interceptor->response.message->data);
-
     if (HTTP_SUCCESS_ERROR == res)
         _http_interceptor_set_status(interceptor, http_interceptor_status_request);
 
     RETURN_ERROR(res);
 }
+
+int http_interceptor_fetch_headers(http_interceptor_t *interceptor)
+{
+    int len = 0;
+    HTTP_ROBUSTNESS_CHECK(interceptor, 0);
+    
+    len = _http_read_buffer(interceptor, interceptor->response.message, HTTP_DEFAULT_BUF_SIZE);
+
+    printf("%s\n", interceptor->response.message->data);
+    
+    printf("len:%d\n", len);
+
+    if (len > 0)
+        _http_interceptor_set_status(interceptor, http_interceptor_status_response_headers);
+
+    RETURN_ERROR(len);
+}
+
 
 
 int http_interceptor_process(http_interceptor_t *interceptor,
@@ -234,29 +400,39 @@ int http_interceptor_process(http_interceptor_t *interceptor,
                              http_request_method_t mothod, 
                              const char *post_buf)
 {
+    int res = HTTP_SUCCESS_ERROR;
+    HTTP_ROBUSTNESS_CHECK((interceptor && connect_params && mothod), HTTP_NULL_VALUE_ERROR);
+
     do {
-        if (interceptor->process_again) {
+        if (interceptor->flag.flag_t.again) {
             ;
         }
 
         switch (interceptor->status) {
             case http_interceptor_status_invalid:
-                http_interceptor_init(interceptor);
-                printf("1\n");
+                res = http_interceptor_init(interceptor);
+                if (HTTP_SUCCESS_ERROR != res)
+                    RETURN_ERROR(res);
                 
 
             case http_interceptor_status_init:
                 http_interceptor_set_connect_params(interceptor, connect_params);
-                http_interceptor_connect(interceptor);
-                
+                res = http_interceptor_connect(interceptor);
+                if (HTTP_SUCCESS_ERROR != res)
+                    RETURN_ERROR(res);
 
             case http_interceptor_status_connect:
-                http_interceptor_request(interceptor, mothod, post_buf);
-                
+                res = http_interceptor_request(interceptor, mothod, post_buf);
+                if (HTTP_SUCCESS_ERROR != res)
+                    RETURN_ERROR(res);
 
             case http_interceptor_status_response_headers:
-                ;
-                break;
+                http_interceptor_fetch_headers(interceptor);
+                http_parser_execute(interceptor->parser, interceptor->parser_settings, interceptor->response.message->data, interceptor->response.message->used);
+                // break;
+
+            case http_interceptor_status_headers_complete:
+                http_interceptor_check_response(interceptor);
 
             case http_interceptor_status_response_body:
                 ;
@@ -270,7 +446,7 @@ int http_interceptor_process(http_interceptor_t *interceptor,
                 break;
         }
 
-    } while (interceptor->process_again);
+    } while (interceptor->flag.flag_t.again);
 
 }
 

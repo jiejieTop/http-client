@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-09 21:57:03
+ * @LastEditTime: 2020-05-11 01:39:18
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -16,9 +16,11 @@
 extern const char *test_ca_get();
 
 #define URL "http://jiejie:test@jiedev.com/index.php?who=jiejie&is=test#frag"
-#define URL1 "https://jiejie:test1@jiedev1.com/test1/index.php?who=jiejie1&is=test#frag1"
+#define URL1 "http://jiejie:test1@jiedev.com/test1/index.php?who=jiejie1&is=test#frag1"
 #define URL2 "http://httpbin.org/get"
 #define URL3 "http://www.jiedev.com"
+#define URL4 "http://httpbin.org/redirect-to?url=jiedev.com&status_code=301"
+#define URL5 "https://httpbin.org/fasa/n/"
 
 int main(void)
 {
@@ -43,6 +45,17 @@ int main(void)
     HTTP_LOG_I("path:%s", http_get_connect_params_path(connect_params));
     HTTP_LOG_I("query:%s", http_get_connect_params_query(connect_params));
     HTTP_LOG_I("farg:%s\n", http_get_connect_params_farg(connect_params));
+
+    // http_url_parsing(connect_params, URL1);
+
+    // HTTP_LOG_I("host:%s", http_get_connect_params_host(connect_params));
+    // HTTP_LOG_I("port:%s", http_get_connect_params_port(connect_params));
+    // HTTP_LOG_I("scheme:%s", http_get_connect_params_scheme(connect_params));
+    // HTTP_LOG_I("user:%s", http_get_connect_params_user(connect_params));
+    // HTTP_LOG_I("password:%s", http_get_connect_params_password(connect_params));
+    // HTTP_LOG_I("path:%s", http_get_connect_params_path(connect_params));
+    // HTTP_LOG_I("query:%s", http_get_connect_params_query(connect_params));
+    // HTTP_LOG_I("farg:%s\n", http_get_connect_params_farg(connect_params));
 
     // http_interceptor_init(&interceptor);
     // http_interceptor_set_connect_params(&interceptor, connect_params);
