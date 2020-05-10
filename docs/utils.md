@@ -80,5 +80,5 @@ int _http_utils_isdigit(int x)
 
 **上一篇**：[network网卡](./network.md)
 
-**下一篇**： [url解析器](./url_parser.md)
+**下一篇**： [通用组件功能](./general.md)
 

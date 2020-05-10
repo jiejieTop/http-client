@@ -20,12 +20,13 @@ typedef struct http_response {
 - 初始化一个响应结构，主要是申请响应报文的内存空间，默认为**HTTP_MESSAGE_BUFFER_GROWTH**。
 
 ```c
-int http_response_init(http_response_t *rsp)
+int http_response_init(ht_t *rsp)
 ```
 
 
 
 
+**上一篇**： [HTTP请求](./request.md)
 
-
+**下一篇**： [拦截器](./interceptor.md)
 

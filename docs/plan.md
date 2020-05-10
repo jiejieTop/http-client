@@ -1,10 +1,10 @@
 # 开发计划
 
-本文档是开发的计划，随时更新，欢迎以 [GitHub Issues](https://github.com/jiejieTop/httpclient/issues) 的形式提交功能需求、问题和bug报告等。
+本文档是开发的计划，随时更新，欢迎以 [GitHub Issues](https://github.com/jiejieTop/http-client/issues) 的形式提交功能需求、问题和bug报告等。
 
 框架如下：
 
-![httpclient框架](http://qiniu.jiejie01.top/httpclient.png)
+![http-client框架](http://qiniu.jiejie01.top/httpclient.png)
 
 ## 平台抽象层
 

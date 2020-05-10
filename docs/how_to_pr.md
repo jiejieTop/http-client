@@ -4,7 +4,7 @@
 
 ## fork项目
 
-在浏览器打开 [https://github.com/jiejieTop/httpclient](https://github.com/jiejieTop/httpclient) ，点击右上角的`fork`按钮，`fork`开源项目到你自己的`github`账户。
+在浏览器打开 [https://github.com/jiejieTop/http-client](https://github.com/jiejieTop/http-client) ，点击右上角的`fork`按钮，`fork`开源项目到你自己的`github`账户。
 
 ![fork项目](http://qiniu.jiejie01.top/how_to_pr001.png)
 
@@ -27,7 +27,7 @@ git clone [你复制的链接]
 添加上游源仓库是为了保证与原始仓库保持一致，因为原始仓库一直保持更新，使用以下命令添加上游源仓库:
 
 ```bash
-git remote add upstream https://github.com/jiejieTop/httpclient.git
+git remote add upstream https://github.com/jiejieTop/http-client.git
 ```
 
 添加完成后可以使用`git remote -v` 查看当前的远程仓库地址信息:
@@ -35,10 +35,10 @@ git remote add upstream https://github.com/jiejieTop/httpclient.git
 ```bash
 git remote -v
 
-origin  https://github.com/iot-strategy/httpclient.git (fetch)
-origin  https://github.com/iot-strategy/httpclient.git (push)
-upstream        https://github.com/jiejieTop/httpclient.git (fetch)
-upstream        https://github.com/jiejieTop/httpclient.git (push)
+origin  https://github.com/iot-strategy/http-client.git (fetch)
+origin  https://github.com/iot-strategy/http-client.git (push)
+upstream        https://github.com/jiejieTop/http-client.git (fetch)
+upstream        https://github.com/jiejieTop/http-client.git (push)
 ```
 
 ## 更新源仓库

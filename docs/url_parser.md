@@ -15,7 +15,7 @@ typedef struct http_connect_params {
     char                        *http_url;
     char                        *http_scheme;
     char                        *http_host;
-    char                        *http_username;
+    char                        *http_user;
     char                        *http_password;
     char                        *http_path;
     char                        *http_query;
@@ -43,6 +43,6 @@ int http_url_parsing(http_connect_params_t *connect_params, const char *url)
 - [http_utils.c](./utils.md) ：http_utils_assign_string()、
 
 
-**上一篇**：[基础组件功能](./utils.md)
+**上一篇**：[通用组件功能](./general.md)
 
 **下一篇**： [HTTP报文处理](./message_buffer.md)
