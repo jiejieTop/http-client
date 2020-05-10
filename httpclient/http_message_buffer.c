@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:21:58
- * @LastEditTime: 2020-05-10 01:24:05
+ * @LastEditTime: 2020-05-10 11:48:18
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -43,6 +43,11 @@ int http_message_buffer_reinit(http_message_buffer_t *buf)
 {
     HTTP_ROBUSTNESS_CHECK(buf, HTTP_NULL_VALUE_ERROR);
 
+    if (0 == buf->length) {
+        buf->length = HTTP_MESSAGE_BUFFER_GROWTH;
+        buf = platform_memory_alloc(HTTP_MESSAGE_BUFFER_GROWTH);
+    }
+    
     memset(buf->data, 0, buf->length);
     buf->data[0] = '\0';
     buf->used = 1;
