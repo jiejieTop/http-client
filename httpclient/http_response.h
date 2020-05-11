@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 19:36:42
- * @LastEditTime: 2020-05-10 22:33:19
+ * @LastEditTime: 2020-05-11 19:59:25
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -66,6 +66,7 @@ typedef struct http_response {
 } http_response_t;
 
 int http_response_init(http_response_t *rsp);
+int http_response_release(http_response_t *rsp);
 
 uint16_t http_response_get_length(http_response_t *rsp);
 void http_response_set_length(http_response_t *rsp, uint16_t length);
@@ -75,5 +76,9 @@ void http_response_set_offset(http_response_t *rsp, uint16_t offset);
 
 http_response_status_t http_response_get_status(http_response_t *rsp);
 void http_response_set_status(http_response_t *rsp, unsigned int status);
+
+char *http_response_get_message(http_response_t *rsp);
+char *http_response_get_body(http_response_t *rsp);
+
 
 #endif // !_HTTP_RESPONSE_H_

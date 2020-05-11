@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:42
- * @LastEditTime: 2020-05-09 15:19:20
+ * @LastEditTime: 2020-05-11 19:18:36
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_REQUEST_H_
@@ -85,6 +85,7 @@ typedef struct http_request {
 } http_request_t;
 
 int http_request_init(http_request_t *req);
+int http_request_release(http_request_t *req);
 int http_request_set_method(http_request_t *req,  http_request_method_t method);
 int http_request_set_start_line(http_request_t *req, const char *path);
 int http_request_set_start_line_with_query(http_request_t *req, const char *path, const char *query);

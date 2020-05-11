@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-11 00:56:52
+ * @LastEditTime: 2020-05-11 20:00:04
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -107,6 +107,7 @@ static int _http_interceptor_set_network(http_interceptor_t *interceptor)
         _http_interceptor_set_status(interceptor, http_interceptor_status_init);
     } else {
         platform_memory_free(interceptor->network);
+        interceptor->network = NULL;
     }
 
     RETURN_ERROR(res);
@@ -127,22 +128,16 @@ static int _http_on_status(http_parser *parser, const char *at, size_t length)
 static int _http_on_header_field(http_parser *parser, const char *at, size_t length)
 {
     http_interceptor_t *interceptor = parser->data;
-    printf("Header field: %.*s\n", (int)length, at);
-
+    // printf("Header field: %.*s\n", (int)length, at);
 
     if(0 == http_utils_ignore_case_nmatch(at, "Location", 8)) {
         interceptor->flag.flag_t.redirects = 1;
-        //  interceptor->flag.flag_t.again = 1;
     } else if(0 == http_utils_ignore_case_nmatch(at, "Transfer-Encoding", 17)) {
         interceptor->flag.flag_t.chunked = 1;
     } else if(0 == http_utils_ignore_case_nmatch(at, "WWW-Authenticate", 16)) {
         interceptor->flag.flag_t.authenticate = 1;
-        interceptor->flag.flag_t.again = 1;
     }
     
-    // printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> %d\n", interceptor->flag.all_flag);
-
-    // http_utils_assign_string(&client->current_header_key, at, length);
     return 0;
 }
 
@@ -151,11 +146,11 @@ static int _http_on_header_value(http_parser *parser, const char *at, size_t len
     http_interceptor_t *interceptor = parser->data;
 
     if (0 != interceptor->flag.flag_t.redirects) {
-        printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> %d\n", interceptor->flag.all_flag);
+        http_set_connect_params_url(interceptor->connect_params, at, length);
         interceptor->flag.flag_t.redirects = 0;
     }
 
-    printf("Header value:%.*s\n", (int)length, at);
+    // printf("Header value:%.*s\n", (int)length, at);
     return 0;
 }
 
@@ -191,6 +186,8 @@ static int _http_on_message_complete(http_parser *parser)
 
     if (0!= interceptor->flag.flag_t.chunked)
         interceptor->flag.flag_t.chunked_complete = 1;
+
+    interceptor->flag.flag_t.complete = 1;      /* complete */
 
     return 0;
 }
@@ -254,6 +251,12 @@ int http_interceptor_check_response(http_interceptor_t *interceptor)
     http_response_status_t status;
     status = http_response_get_status(&interceptor->response);
 
+    if (0 != interceptor->flag.flag_t.complete) {
+        interceptor->flag.flag_t.complete = 0;
+        _http_interceptor_set_status(interceptor, http_interceptor_status_response_complete);
+    }
+
+
     switch (status) {
         case http_response_status_moved_permanently:
         case http_response_status_found:
@@ -262,7 +265,9 @@ int http_interceptor_check_response(http_interceptor_t *interceptor)
         case http_response_status_use_proxy:
         case http_response_status_unused:
         case http_response_status_temporary_redirect:
-            // http_url_parsing(interceptor->connect_params, )
+            interceptor->flag.flag_t.again = 1;
+            _http_interceptor_set_status(interceptor, http_interceptor_status_release);
+            http_url_parsing(interceptor->connect_params, http_get_connect_params_url(interceptor->connect_params));
             break;
 
         default:
@@ -276,9 +281,7 @@ int http_interceptor_init(http_interceptor_t *interceptor)
     HTTP_ROBUSTNESS_CHECK(interceptor, HTTP_NULL_VALUE_ERROR);
 
     interceptor->network = (network_t*) platform_memory_alloc(sizeof(network_t));
-    interceptor->parser = (struct http_parser *)platform_memory_alloc(sizeof(struct http_parser));
-
-    HTTP_ROBUSTNESS_CHECK((interceptor->network && interceptor->parser), HTTP_MEM_NOT_ENOUGH_ERROR);
+    HTTP_ROBUSTNESS_CHECK(interceptor->network, HTTP_MEM_NOT_ENOUGH_ERROR);
 
     http_request_init(&interceptor->request);
     http_response_init(&interceptor->response);
@@ -317,6 +320,7 @@ int http_interceptor_connect(http_interceptor_t *interceptor)
         _http_interceptor_set_status(interceptor, http_interceptor_status_connect);
     } else {
         network_release(interceptor->network);
+        interceptor->network = NULL;
     }
 
     RETURN_ERROR(res);
@@ -383,16 +387,37 @@ int http_interceptor_fetch_headers(http_interceptor_t *interceptor)
     
     len = _http_read_buffer(interceptor, interceptor->response.message, HTTP_DEFAULT_BUF_SIZE);
 
-    printf("%s\n", interceptor->response.message->data);
-    
-    printf("len:%d\n", len);
-
     if (len > 0)
         _http_interceptor_set_status(interceptor, http_interceptor_status_response_headers);
 
     RETURN_ERROR(len);
 }
 
+int http_interceptor_submit_data(http_interceptor_t *interceptor)
+{
+    HTTP_LOG_I("http_interceptor_submit_data:\n%s\n", http_response_get_body(&interceptor->response));
+    _http_interceptor_set_status(interceptor, http_interceptor_status_release);
+}
+
+int http_interceptor_release(http_interceptor_t *interceptor)
+{
+    HTTP_ROBUSTNESS_CHECK(interceptor, HTTP_NULL_VALUE_ERROR);
+
+    network_release(interceptor->network);
+    platform_memory_free(interceptor->network);
+    platform_memory_free(interceptor->parser);
+    platform_memory_free(interceptor->parser_settings);
+    http_message_buffer_release(interceptor->message);
+    http_request_release(&interceptor->request);
+    http_response_release(&interceptor->response);
+
+    interceptor->network = NULL;
+    interceptor->parser = NULL;
+    interceptor->parser_settings = NULL;
+    interceptor->message = NULL;
+
+    _http_interceptor_set_status(interceptor, http_interceptor_status_invalid);
+}
 
 
 int http_interceptor_process(http_interceptor_t *interceptor,
@@ -405,7 +430,8 @@ int http_interceptor_process(http_interceptor_t *interceptor,
 
     do {
         if (interceptor->flag.flag_t.again) {
-            ;
+            interceptor->flag.flag_t.again = 0;
+            interceptor->status = 0;
         }
 
         switch (interceptor->status) {
@@ -417,9 +443,12 @@ int http_interceptor_process(http_interceptor_t *interceptor,
 
             case http_interceptor_status_init:
                 http_interceptor_set_connect_params(interceptor, connect_params);
+                
                 res = http_interceptor_connect(interceptor);
                 if (HTTP_SUCCESS_ERROR != res)
                     RETURN_ERROR(res);
+                
+                HTTP_LOG_I("interceptor connect success ...");
 
             case http_interceptor_status_connect:
                 res = http_interceptor_request(interceptor, mothod, post_buf);
@@ -428,19 +457,21 @@ int http_interceptor_process(http_interceptor_t *interceptor,
 
             case http_interceptor_status_response_headers:
                 http_interceptor_fetch_headers(interceptor);
-                http_parser_execute(interceptor->parser, interceptor->parser_settings, interceptor->response.message->data, interceptor->response.message->used);
-                // break;
+
+                http_parser_execute(interceptor->parser, 
+                                    interceptor->parser_settings, 
+                                    interceptor->response.message->data, 
+                                    interceptor->response.message->used);
 
             case http_interceptor_status_headers_complete:
                 http_interceptor_check_response(interceptor);
 
             case http_interceptor_status_response_body:
-                ;
-                break;
+            case http_interceptor_status_response_complete:
+                http_interceptor_submit_data(interceptor);
 
-            case http_interceptor_status_close:
-                ;
-                break;
+            case http_interceptor_status_release:
+                http_interceptor_release(interceptor);
 
             default:
                 break;

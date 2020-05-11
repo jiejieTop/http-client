@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-10 21:34:05
+ * @LastEditTime: 2020-05-11 18:40:29
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -23,7 +23,8 @@ typedef enum http_interceptor_status {
     http_interceptor_status_response_headers,
     http_interceptor_status_headers_complete,
     http_interceptor_status_response_body,
-    http_interceptor_status_close
+    http_interceptor_status_response_complete,
+    http_interceptor_status_release
 } http_interceptor_status_t;
 
 typedef struct http_interceptor {
@@ -46,7 +47,8 @@ typedef struct http_interceptor {
             uint32_t authenticate       : 4;
             uint32_t chunked            : 4;
             uint32_t chunked_complete   : 4;
-            uint32_t close              : 8;
+            uint32_t complete           : 4;
+            uint32_t close              : 4;
         } flag_t;
     } flag;
 } http_interceptor_t;
@@ -56,6 +58,7 @@ int http_interceptor_init(http_interceptor_t *interceptor);
 int http_interceptor_connect(http_interceptor_t *interceptor);
 int http_interceptor_set_connect_params(http_interceptor_t *interceptor, http_connect_params_t *conn_param);
 int http_interceptor_request(http_interceptor_t *interceptor, http_request_method_t mothod, const char *post_buf);
+int http_interceptor_release(http_interceptor_t *interceptor);
 int http_interceptor_process(http_interceptor_t *interceptor,
                              http_connect_params_t *connect_params,
                              http_request_method_t mothod, 

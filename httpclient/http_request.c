@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:36
- * @LastEditTime: 2020-05-09 21:28:12
+ * @LastEditTime: 2020-05-11 19:34:05
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -57,6 +57,21 @@ int http_request_init(http_request_t *req)
     req->req_msg.header = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
     req->req_msg.body = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
 
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
+}
+
+int http_request_release(http_request_t *req)
+{
+    HTTP_ROBUSTNESS_CHECK(req , HTTP_NULL_VALUE_ERROR);
+
+    http_message_buffer_release(req->req_msg.line );
+    http_message_buffer_release(req->req_msg.header);
+    http_message_buffer_release(req->req_msg.body);
+
+    req->req_msg.line = NULL;
+    req->req_msg.header = NULL;
+    req->req_msg.body = NULL;
+    
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
