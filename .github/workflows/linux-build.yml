@@ -17,7 +17,5 @@ jobs:
       run: sudo apt-get install -y cmake
     - name: build
       run: ./build.sh
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    - name: runnig test
+      run: ./build/bin.http-client
