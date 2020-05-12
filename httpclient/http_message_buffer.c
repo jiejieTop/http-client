@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:21:58
- * @LastEditTime: 2020-05-10 11:48:18
+ * @LastEditTime: 2020-05-12 13:50:24
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -134,3 +134,21 @@ int http_message_buffer_pointer(http_message_buffer_t *buf, const char *str, siz
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
+
+char *http_message_buffer_get_data(http_message_buffer_t *buf)
+{
+    HTTP_ROBUSTNESS_CHECK(buf, NULL);
+    return buf->data;
+}
+
+size_t http_message_buffer_get_used(http_message_buffer_t *buf)
+{
+    HTTP_ROBUSTNESS_CHECK(buf, 0);
+    return buf->used;
+}
+
+size_t http_message_buffer_get_length(http_message_buffer_t *buf)
+{
+    HTTP_ROBUSTNESS_CHECK(buf, 0);
+    return buf->length;
+}

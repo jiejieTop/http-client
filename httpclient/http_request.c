@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:36
- * @LastEditTime: 2020-05-11 19:34:05
+ * @LastEditTime: 2020-05-12 09:09:01
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -83,11 +83,12 @@ int http_request_header_init(http_request_t *req)
     req->header_index = 0;
     http_message_buffer_reinit(req->req_msg.header);
 
-    if (req->req_flag.flag_t.no_keep_alive) {
+    if (req->req_flag.flag_t.keep_alive) {
+        http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Keep-Alive");
+    } else {
         http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Close");
     }
 
-    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Close");
     http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_ACCEPT, "*/*");
     http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_USER_AGENT, "http-client-by-jiejie");
 
@@ -108,10 +109,10 @@ int http_request_set_version(http_request_t *req, const char *str)
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
-int http_request_no_keep_alive(http_request_t *req)
+int http_request_set_keep_alive(http_request_t *req)
 {
     HTTP_ROBUSTNESS_CHECK(req , HTTP_NULL_VALUE_ERROR);
-    req->req_flag.flag_t.no_keep_alive = 1;
+    req->req_flag.flag_t.keep_alive = 1;
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 

@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-11 18:40:29
+ * @LastEditTime: 2020-05-12 22:14:45
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -14,7 +14,7 @@
 #include <http_request.h>
 #include <http_response.h>
 #include <http_general.h>
-
+#include <http_event.h>
 typedef enum http_interceptor_status {
     http_interceptor_status_invalid = 0x00,
     http_interceptor_status_init,
@@ -48,7 +48,7 @@ typedef struct http_interceptor {
             uint32_t chunked            : 4;
             uint32_t chunked_complete   : 4;
             uint32_t complete           : 4;
-            uint32_t close              : 4;
+            uint32_t keep_alive         : 4;
         } flag_t;
     } flag;
 } http_interceptor_t;

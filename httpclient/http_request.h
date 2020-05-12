@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:42
- * @LastEditTime: 2020-05-11 19:18:36
+ * @LastEditTime: 2020-05-12 09:07:45
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_REQUEST_H_
@@ -77,7 +77,7 @@ typedef struct http_request {
     union {
         uint32_t                    flag;
         struct {
-            uint32_t no_keep_alive  : 8;
+            uint32_t keep_alive     : 8;
             uint32_t no_is_http11   : 8;
             uint32_t othre          : 16;
         } flag_t;
@@ -98,7 +98,7 @@ char *http_request_get_header_form_index(http_request_t *req, http_request_heade
 int http_request_set_body(http_request_t *req, const char *buf, size_t size);
 int http_request_set_body_form_pointer(http_request_t *req, const char *buf, size_t size);
 
-int http_request_no_keep_alive(http_request_t *req);
+int http_request_set_keep_alive(http_request_t *req);
 int http_request_set_version(http_request_t *req, const char *str);
 
 char *http_request_get_start_line_data(http_request_t *req);

@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-11 20:03:52
+ * @LastEditTime: 2020-05-12 21:42:05
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -21,7 +21,7 @@ extern const char *test_ca_get();
 #define URL3 "http://www.jiedev.com"
 #define URL4 "http://httpbin.org/redirect-to?url=http://www.jiedev.com&status_code=301"
 #define URL5 "http://httpbin.org/fasa/n/"
-
+#define URL6 "http://httpbin.org/post"
 
 int main(void)
 {
@@ -36,7 +36,7 @@ int main(void)
     
     connect_params = http_assign_connect_params();
 
-    http_url_parsing(connect_params, URL3);
+    http_url_parsing(connect_params, URL6);
 
     HTTP_LOG_I("host:%s", http_get_connect_params_host(connect_params));
     HTTP_LOG_I("port:%s", http_get_connect_params_port(connect_params));
@@ -63,7 +63,7 @@ int main(void)
     // http_interceptor_connect(&interceptor);
     // http_interceptor_request(&interceptor, HTTP_REQUEST_METHOD_GET, NULL);
 
-    http_interceptor_process(&interceptor, connect_params, HTTP_REQUEST_METHOD_GET, NULL);
+    http_interceptor_process(&interceptor, connect_params, HTTP_REQUEST_METHOD_POST, "NULL");
 
     sleep(10);
 
