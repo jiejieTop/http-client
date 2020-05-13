@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-12 21:42:05
+ * @LastEditTime: 2020-05-13 19:01:27
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -23,6 +23,11 @@ extern const char *test_ca_get();
 #define URL5 "http://httpbin.org/fasa/n/"
 #define URL6 "http://httpbin.org/post"
 
+int my_http_cb(void *e)
+{
+    printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
+}
+
 int main(void)
 {
     http_interceptor_t interceptor;
@@ -36,7 +41,7 @@ int main(void)
     
     connect_params = http_assign_connect_params();
 
-    http_url_parsing(connect_params, URL6);
+    http_url_parsing(connect_params, URL2);
 
     HTTP_LOG_I("host:%s", http_get_connect_params_host(connect_params));
     HTTP_LOG_I("port:%s", http_get_connect_params_port(connect_params));
@@ -63,7 +68,7 @@ int main(void)
     // http_interceptor_connect(&interceptor);
     // http_interceptor_request(&interceptor, HTTP_REQUEST_METHOD_GET, NULL);
 
-    http_interceptor_process(&interceptor, connect_params, HTTP_REQUEST_METHOD_POST, "NULL");
+    http_interceptor_process(&interceptor, connect_params, HTTP_REQUEST_METHOD_GET, NULL, my_http_cb);
 
     sleep(10);
 

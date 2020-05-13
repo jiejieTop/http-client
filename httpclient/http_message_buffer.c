@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:21:58
- * @LastEditTime: 2020-05-12 13:50:24
+ * @LastEditTime: 2020-05-13 16:03:37
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -57,7 +57,8 @@ int http_message_buffer_reinit(http_message_buffer_t *buf)
 
 void http_message_buffer_release(http_message_buffer_t *buf)
 {
-    HTTP_ROBUSTNESS_CHECK(buf, HTTP_VOID);
+    if (NULL == buf)
+        return;
 
     if (0 != buf->length) {
         buf->length = 0;
