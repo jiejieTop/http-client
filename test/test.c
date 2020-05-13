@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-13 19:01:27
+ * @LastEditTime: 2020-05-13 22:42:03
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -42,6 +42,8 @@ int main(void)
     connect_params = http_assign_connect_params();
 
     http_url_parsing(connect_params, URL2);
+    
+    http_client_get_data(URL2);
 
     HTTP_LOG_I("host:%s", http_get_connect_params_host(connect_params));
     HTTP_LOG_I("port:%s", http_get_connect_params_port(connect_params));
