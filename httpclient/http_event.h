@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-12 13:52:36
- * @LastEditTime: 2020-05-13 19:04:36
+ * @LastEditTime: 2020-05-14 22:49:46
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -15,15 +15,15 @@
 typedef int (*http_event_cb_t)(void *e);
 
 typedef enum http_event_type {
-    http_event_type_on_error = 0x00,
-    http_event_type_on_connect,
-    http_event_type_on_request,
-    http_event_type_on_response,
-    http_event_type_on_headers,
-    http_event_type_on_body,
-    http_event_type_on_submit,
-    http_event_type_on_release,
-    http_event_type_all
+    http_event_type_on_error = ~0x0,
+    http_event_type_on_connect = 0x0001 << 0,
+    http_event_type_on_request = 0x0001 << 1,
+    http_event_type_on_response = 0x0001 << 2,
+    http_event_type_on_headers = 0x0001 << 3,
+    http_event_type_on_body = 0x0001 << 4,
+    http_event_type_on_submit = 0x0001 << 5,
+    http_event_type_on_release = 0x0001 << 6,
+    http_event_type_all = 0x0001 << 7
 } http_event_type_t;
 
 typedef struct http_event {

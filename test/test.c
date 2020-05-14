@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-13 22:42:03
+ * @LastEditTime: 2020-05-14 23:15:12
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -25,34 +25,36 @@ extern const char *test_ca_get();
 
 int my_http_cb(void *e)
 {
-    printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
+    http_event_t *event = e;
+    
+    printf("len:%ld, data:\n%s\n", event->len, (char*)event->data);
 }
 
 int main(void)
 {
-    http_interceptor_t interceptor;
-    http_connect_params_t *connect_params = NULL;
+    // http_interceptor_t interceptor;
+    // http_connect_params_t *connect_params = NULL;
 
-    memset(&interceptor, 0, sizeof(http_interceptor_t));
+    // memset(&interceptor, 0, sizeof(http_interceptor_t));
 
     http_log_init();
 
     // HTTP_LOG_I("url:%s", URL);
     
-    connect_params = http_assign_connect_params();
+    // connect_params = http_assign_connect_params();
 
-    http_url_parsing(connect_params, URL2);
+    // http_url_parsing(connect_params, URL2);
     
-    http_client_get_data(URL2);
+    http_client_get_data(URL2, my_http_cb);
 
-    HTTP_LOG_I("host:%s", http_get_connect_params_host(connect_params));
-    HTTP_LOG_I("port:%s", http_get_connect_params_port(connect_params));
-    HTTP_LOG_I("scheme:%s", http_get_connect_params_scheme(connect_params));
-    HTTP_LOG_I("user:%s", http_get_connect_params_user(connect_params));
-    HTTP_LOG_I("password:%s", http_get_connect_params_password(connect_params));
-    HTTP_LOG_I("path:%s", http_get_connect_params_path(connect_params));
-    HTTP_LOG_I("query:%s", http_get_connect_params_query(connect_params));
-    HTTP_LOG_I("farg:%s\n", http_get_connect_params_farg(connect_params));
+    // HTTP_LOG_I("host:%s", http_get_connect_params_host(connect_params));
+    // HTTP_LOG_I("port:%s", http_get_connect_params_port(connect_params));
+    // HTTP_LOG_I("scheme:%s", http_get_connect_params_scheme(connect_params));
+    // HTTP_LOG_I("user:%s", http_get_connect_params_user(connect_params));
+    // HTTP_LOG_I("password:%s", http_get_connect_params_password(connect_params));
+    // HTTP_LOG_I("path:%s", http_get_connect_params_path(connect_params));
+    // HTTP_LOG_I("query:%s", http_get_connect_params_query(connect_params));
+    // HTTP_LOG_I("farg:%s\n", http_get_connect_params_farg(connect_params));
 
     // http_url_parsing(connect_params, URL1);
 
@@ -70,7 +72,7 @@ int main(void)
     // http_interceptor_connect(&interceptor);
     // http_interceptor_request(&interceptor, HTTP_REQUEST_METHOD_GET, NULL);
 
-    http_interceptor_process(&interceptor, connect_params, HTTP_REQUEST_METHOD_GET, NULL, my_http_cb);
+    // http_interceptor_process(&interceptor, connect_params, HTTP_REQUEST_METHOD_GET, NULL, my_http_cb);
 
     sleep(10);
 

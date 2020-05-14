@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-13 16:40:59
+ * @LastEditTime: 2020-05-14 22:37:55
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -39,6 +39,7 @@ typedef struct http_interceptor {
     struct http_parser          *parser;
     struct http_parser_settings *parser_settings;
     http_event_t                *evetn;
+    void                        *owner;
     union {
         uint32_t                all_flag;
         struct {
@@ -56,6 +57,7 @@ typedef struct http_interceptor {
 
 
 int http_interceptor_init(http_interceptor_t *interceptor);
+void http_interceptor_set_owner(http_interceptor_t *interceptor, void *owner);
 void http_interceptor_event_register(http_interceptor_t *interceptor, http_event_cb_t cb);
 int http_interceptor_connect(http_interceptor_t *interceptor);
 int http_interceptor_set_connect_params(http_interceptor_t *interceptor, http_connect_params_t *conn_param);
@@ -65,6 +67,7 @@ int http_interceptor_process(http_interceptor_t *interceptor,
                              http_connect_params_t *connect_params,
                              http_request_method_t mothod, 
                              const char *post_buf,
+                             void *owner,
                              http_event_cb_t cb);
 
 

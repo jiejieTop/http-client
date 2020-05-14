@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-13 19:07:42
+ * @LastEditTime: 2020-05-14 22:39:16
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -289,8 +289,12 @@ int http_interceptor_init(http_interceptor_t *interceptor)
     interceptor->cmd_timeout = HTTP_DEFAULT_CMD_TIMEOUT;
     interceptor->message_len = HTTP_DEFAULT_BUF_SIZE;
 
-    interceptor->evetn = http_event_init();
-    interceptor->message = http_message_buffer_init(interceptor->message_len);
+    if (NULL == interceptor->evetn)
+        interceptor->evetn = http_event_init();
+    
+    if (NULL == interceptor->message)
+        interceptor->message = http_message_buffer_init(interceptor->message_len);
+    
     HTTP_ROBUSTNESS_CHECK((interceptor->message), HTTP_MEM_NOT_ENOUGH_ERROR);
 
     res = _http_interceptor_prepare(interceptor);
@@ -300,9 +304,20 @@ int http_interceptor_init(http_interceptor_t *interceptor)
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
+void http_interceptor_set_owner(http_interceptor_t *interceptor, void *owner)
+{
+    HTTP_ROBUSTNESS_CHECK(interceptor, HTTP_VOID);
+
+    interceptor->owner = owner;
+}
+
 void http_interceptor_event_register(http_interceptor_t *interceptor, http_event_cb_t cb)
 {
     HTTP_ROBUSTNESS_CHECK(interceptor, HTTP_VOID);
+
+    if (NULL == interceptor->evetn)
+        interceptor->evetn = http_event_init();
+
     if (NULL != cb) {
         http_event_register(interceptor->evetn, cb);
     }
@@ -473,6 +488,7 @@ int http_interceptor_process(http_interceptor_t *interceptor,
                              http_connect_params_t *connect_params,
                              http_request_method_t mothod, 
                              const char *post_buf,
+                             void *owner,
                              http_event_cb_t cb)
 {
     int res = HTTP_SUCCESS_ERROR;
@@ -487,6 +503,7 @@ int http_interceptor_process(http_interceptor_t *interceptor,
         switch (interceptor->status) {
             case http_interceptor_status_invalid:
                 http_interceptor_init(interceptor);
+                http_interceptor_set_owner(interceptor, owner);
                 http_interceptor_event_register(interceptor, cb);
                 http_interceptor_set_connect_params(interceptor, connect_params);
                 
