@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-13 22:41:53
+ * @LastEditTime: 2020-05-14 10:52:28
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTPCLIENT_H_
@@ -30,6 +30,7 @@
 
 
 typedef struct http_client {
+    uint32_t                            index;
     http_connect_status_t               status;
     http_list_t                         connect_pool_list;
     platform_mutex_t                    global_lock;
