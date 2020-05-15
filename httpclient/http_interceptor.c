@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-15 20:18:22
+ * @LastEditTime: 2020-05-15 23:18:40
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -84,6 +84,8 @@ static http_interceptor_status_t _http_interceptor_get_status(http_interceptor_t
     return interceptor->status;
 }
 
+extern const char *ca_get();
+
 static int _http_interceptor_set_network(http_interceptor_t *interceptor)
 {
     int res = HTTP_SUCCESS_ERROR;
@@ -97,11 +99,14 @@ static int _http_interceptor_set_network(http_interceptor_t *interceptor)
         memset(interceptor->network, 0, sizeof(network_t));
     }
 
-    res = network_init(interceptor->network, &interceptor->network->network_params);
+    res = network_init( interceptor->network,
+                        http_get_connect_params_host(interceptor->connect_params),
+                        http_get_connect_params_port(interceptor->connect_params),
+                        NULL);
     
-    network_set_addr_port(interceptor->network, 
-                          interceptor->connect_params->http_host, 
-                          interceptor->connect_params->http_port);
+    if (http_utils_ignore_case_match(http_get_connect_params_scheme(interceptor->connect_params), "https") == 0) {
+        network_set_ca(interceptor->network, ca_get());
+    }
 
     if (HTTP_SUCCESS_ERROR == res) {
         _http_interceptor_set_status(interceptor, http_interceptor_status_init);

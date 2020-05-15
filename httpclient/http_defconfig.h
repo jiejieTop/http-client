@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-02-25 03:36:09
- * @LastEditTime: 2020-05-07 09:04:42
+ * @LastEditTime: 2020-05-15 21:57:11
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -61,7 +61,7 @@
 
 
 
-#ifdef HTTP_NETWORK_TYPE_TLS
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
 
 #ifndef HTTP_TLS_HANDSHAKE_TIMEOUT
     #define HTTP_TLS_HANDSHAKE_TIMEOUT  (5 * 1000)

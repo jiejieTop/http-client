@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-15 15:15:40
+ * @LastEditTime: 2020-05-15 23:18:54
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -46,8 +46,8 @@ int main(void)
     // http_url_parsing(connect_params, URL2);
     http_client_init();
     
-    http_client_get(URL3, my_http_cb);
-    http_client_post(URL6, "this is a test post...", my_http_cb);
+    http_client_get(URL2, my_http_cb);
+    // http_client_post(URL6, "this is a test post...", my_http_cb);
 
     // HTTP_LOG_I("host:%s", http_get_connect_params_host(connect_params));
     // HTTP_LOG_I("port:%s", http_get_connect_params_port(connect_params));

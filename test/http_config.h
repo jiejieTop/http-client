@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 00:42:16
- * @LastEditTime: 2020-05-11 20:00:41
+ * @LastEditTime: 2020-05-15 21:56:14
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_CONFIG_H_
@@ -39,7 +39,7 @@
 #define     HTTP_THREAD_PRIO                    10
 #define     HTTP_THREAD_TICK                    50
 
-// #define     HTTP_NETWORK_TYPE_TLS
+// #define     HTTP_NETWORK_TYPE_NO_TLS
 
 #endif /* _HTTP_CONFIG_H_ */
 
