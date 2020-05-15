@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-14 23:11:59
+ * @LastEditTime: 2020-05-15 14:12:40
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTPCLIENT_H_
@@ -39,7 +39,11 @@ typedef struct http_client {
     http_event_t                        *event;
 } http_client_t;
 
-
-int http_client_get_data(const char *url, http_event_cb_t cb);
+int http_client_init(void);
+http_client_t *http_client_assign(void);
+void http_client_release(http_client_t *c);
+int http_client_get(const char *url, http_event_cb_t cb);
+int http_client_post(const char *url, void *data ,http_event_cb_t cb);
+void http_client_set_interest_event(http_client_t *c, http_event_type_t event);
 
 #endif /* _HTTPCLIENT_H_ */

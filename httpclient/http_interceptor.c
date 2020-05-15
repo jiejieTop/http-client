@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-14 22:39:16
+ * @LastEditTime: 2020-05-15 20:18:22
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -97,12 +97,12 @@ static int _http_interceptor_set_network(http_interceptor_t *interceptor)
         memset(interceptor->network, 0, sizeof(network_t));
     }
 
+    res = network_init(interceptor->network, &interceptor->network->network_params);
+    
     network_set_addr_port(interceptor->network, 
                           interceptor->connect_params->http_host, 
                           interceptor->connect_params->http_port);
 
-    res = network_init(interceptor->network, &interceptor->network->network_params);
-    
     if (HTTP_SUCCESS_ERROR == res) {
         _http_interceptor_set_status(interceptor, http_interceptor_status_init);
     } else {
@@ -114,7 +114,7 @@ static int _http_interceptor_set_network(http_interceptor_t *interceptor)
 
 static int _http_on_url(http_parser *parser, const char *at, size_t length)
 {
-    HTTP_LOG_D("_http_on_url");
+    // HTTP_LOG_D("_http_on_url");
     return 0;
 }
 
@@ -203,13 +203,13 @@ static int _http_on_body(http_parser *parser, const char *at, size_t length)
 
 static int _http_on_chunk_header(http_parser *parser)
 {
-    HTTP_LOG_D("_http_on_chunk_header");
+    // HTTP_LOG_D("_http_on_chunk_header");
     return 0;
 }
 
 static int _http_on_chunk_complete(http_parser *parser)
 {
-    HTTP_LOG_D("_http_on_chunk_complete");
+    // HTTP_LOG_D("_http_on_chunk_complete");
     return 0;
 }
 
@@ -340,7 +340,7 @@ int http_interceptor_connect(http_interceptor_t *interceptor)
 
     if (HTTP_SUCCESS_ERROR == res) {
         _http_interceptor_set_status(interceptor, http_interceptor_status_connect);
-        HTTP_LOG_D("interceptor connect success ...");
+        HTTP_LOG_D("interceptor connect success ...\n");
     } else {
         _http_interceptor_set_status(interceptor, http_interceptor_status_release);
     }
@@ -487,7 +487,7 @@ int http_interceptor_release(http_interceptor_t *interceptor)
 int http_interceptor_process(http_interceptor_t *interceptor,
                              http_connect_params_t *connect_params,
                              http_request_method_t mothod, 
-                             const char *post_buf,
+                             void *post_buf,
                              void *owner,
                              http_event_cb_t cb)
 {

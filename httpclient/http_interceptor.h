@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-14 22:37:55
+ * @LastEditTime: 2020-05-15 16:15:34
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -15,6 +15,7 @@
 #include <http_response.h>
 #include <http_general.h>
 #include <http_event.h>
+
 typedef enum http_interceptor_status {
     http_interceptor_status_invalid = 0x00,
     http_interceptor_status_init,
@@ -66,7 +67,7 @@ int http_interceptor_release(http_interceptor_t *interceptor);
 int http_interceptor_process(http_interceptor_t *interceptor,
                              http_connect_params_t *connect_params,
                              http_request_method_t mothod, 
-                             const char *post_buf,
+                             void *post_buf,
                              void *owner,
                              http_event_cb_t cb);
 

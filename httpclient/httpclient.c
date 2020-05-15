@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-14 23:12:07
+ * @LastEditTime: 2020-05-15 16:13:37
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -28,49 +28,10 @@ static int _http_client_internal_event_handle(void *e)
     if (0 == c->interest_event)
         RETURN_ERROR(HTTP_SUCCESS_ERROR);
 
-    switch (event->type) {
-    case http_event_type_on_error:
-        HTTP_LOG_E("http event error ...");
-        break;
-
-    case http_event_type_on_connect:
-        HTTP_LOG_D("http event connect ...");
-        break;
-
-    case http_event_type_on_request:
-        HTTP_LOG_D("http event request ...");
-        break;
-
-    case http_event_type_on_response:
-        HTTP_LOG_D("http event response ...");
-        break;
-
-    case http_event_type_on_headers:
-        HTTP_LOG_D("http event headers ...");
-        break;
-
-    case http_event_type_on_body:
-        HTTP_LOG_D("http event body ...");
-        break;
-
-    case http_event_type_on_submit:
-        HTTP_LOG_D("http event submit ...");
-
-        if (c->interest_event & http_event_type_on_submit) {
-            http_event_dispatch(c->event, http_event_type_on_submit, c, event->data, event->len);
-        }
-        
-        break;
-
-    case http_event_type_on_release:
-        HTTP_LOG_D("http event release ...");
-        break;
-
-    default:
-        break;
+    if (c->interest_event & event->type) {
+            http_event_dispatch(c->event, event->type, c, event->data, event->len);
     }
-
-    
+    return 0;
 }
 
 
@@ -127,6 +88,31 @@ void *_http_client_pool_init(void)
     }
 }
 
+int _http_client_handle(const char *url, void *data, http_request_method_t opt, http_event_cb_t cb)
+{
+    http_client_t *c = NULL;
+
+    HTTP_ROBUSTNESS_CHECK(url, HTTP_NULL_VALUE_ERROR);
+
+    c = http_client_assign();
+
+    HTTP_ROBUSTNESS_CHECK(c, HTTP_FAILED_ERROR);
+
+    http_client_set_interest_event(c, http_event_type_on_body);
+
+    http_event_register(c->event, cb);
+
+    http_url_parsing(c->connect_params, url);
+
+    http_interceptor_process(c->interceptor, 
+                             c->connect_params, 
+                             opt, 
+                             data, 
+                             c,
+                             _http_client_internal_event_handle);
+    http_client_release(c);
+}
+
 int http_client_init(void)
 {
     _http_client_pool_init();
@@ -165,33 +151,14 @@ void http_client_set_interest_event(http_client_t *c, http_event_type_t event)
     c->interest_event = event;
 }
 
-int http_client_get_data(const char *url, http_event_cb_t cb)
+int http_client_get(const char *url, http_event_cb_t cb)
 {
-    http_client_t *c = NULL;
-    
-    HTTP_ROBUSTNESS_CHECK(url, HTTP_NULL_VALUE_ERROR);
-
-    http_client_init();
-
-    c = http_client_assign();
-
-    http_client_set_interest_event(c, http_event_type_on_submit);
-
-    http_event_register(c->event, cb);
-
-    http_url_parsing(c->connect_params, url);
-
-    http_interceptor_process(c->interceptor, 
-                             c->connect_params, 
-                             HTTP_REQUEST_METHOD_GET, 
-                             NULL, 
-                             c,
-                             _http_client_internal_event_handle);
+    return _http_client_handle(url, NULL, HTTP_REQUEST_METHOD_GET, cb);
 }
 
-
-// void http_client_register()
-
-
+int http_client_post(const char *url, void *data, http_event_cb_t cb)
+{
+    return _http_client_handle(url, data, HTTP_REQUEST_METHOD_POST, cb);
+}
 
 

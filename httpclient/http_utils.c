@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-03 13:35:08
- * @LastEditTime: 2020-05-07 09:16:46
+ * @LastEditTime: 2020-05-15 15:06:38
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -126,7 +126,6 @@ char *http_utils_assign_string(char **str, const char *new_str, int len)
 
     if (old_str) {
         old_str = platform_memory_realloc(old_str, l + 1);
-        old_str[l] = 0;
     } else {
         old_str = platform_memory_alloc(l + 1);
     }
@@ -134,6 +133,7 @@ char *http_utils_assign_string(char **str, const char *new_str, int len)
     if (NULL != old_str) {
         memcpy(old_str, new_str, l);
         *str = old_str;
+        old_str[l] = '\0';
     }
     return old_str;
 }

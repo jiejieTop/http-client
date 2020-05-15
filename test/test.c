@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-14 23:15:12
+ * @LastEditTime: 2020-05-15 15:15:40
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -44,8 +44,10 @@ int main(void)
     // connect_params = http_assign_connect_params();
 
     // http_url_parsing(connect_params, URL2);
+    http_client_init();
     
-    http_client_get_data(URL2, my_http_cb);
+    http_client_get(URL3, my_http_cb);
+    http_client_post(URL6, "this is a test post...", my_http_cb);
 
     // HTTP_LOG_I("host:%s", http_get_connect_params_host(connect_params));
     // HTTP_LOG_I("port:%s", http_get_connect_params_port(connect_params));
@@ -74,7 +76,7 @@ int main(void)
 
     // http_interceptor_process(&interceptor, connect_params, HTTP_REQUEST_METHOD_GET, NULL, my_http_cb);
 
-    sleep(10);
+    sleep(1);
 
     return 0;
 }

@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-08 21:08:26
- * @LastEditTime: 2020-05-11 11:33:17
+ * @LastEditTime: 2020-05-15 14:34:55
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -24,8 +24,12 @@ HTTP_SET_AND_GET_CONNECT_PARAMS_DEFINE(port, const char*, NULL)
 
 http_connect_params_t *http_assign_connect_params(void)
 {
+    int len = sizeof(http_connect_params_t);
     http_connect_params_t *connect_params = NULL;
-    connect_params = platform_memory_alloc(sizeof(http_connect_params_t));
+
+    connect_params = platform_memory_alloc(len);
+    memset(connect_params, 0, len);
+    
     return connect_params;
 }
 
