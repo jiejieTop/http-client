@@ -36,7 +36,21 @@ typedef struct http_interceptor {
     uint16_t                    cmd_timeout;
     struct http_parser          *parser;
     struct http_parser_settings *parser_settings;
-    uint16_t                    process_again;
+    http_event_t                *evetn;
+    void                        *owner;
+    union {
+        uint32_t                all_flag;
+        struct {
+            uint32_t again              : 4;
+            uint32_t redirects          : 4;
+            uint32_t retry              : 4;
+            uint32_t authenticate       : 4;
+            uint32_t chunked            : 4;
+            uint32_t chunked_complete   : 4;
+            uint32_t complete           : 4;
+            uint32_t keep_alive         : 4;
+        } flag_t;
+    } flag;
 } http_interceptor_t;
 ```
 
@@ -60,16 +74,55 @@ typedef struct http_interceptor {
 
 - parser_settings：解析报文时响应的配置，其实是指定相应的回调函数。
 
-- process_again：是否需要重新处理标志。
+- evetn：事件回调，在需要的时候通过回调函数处理，将数据上报，比如发生错误的时候、在请求之前、在接收到应答的时候、在解析报文的时候、在解析完成报文的时候、上报body数据的时候等等。
+
+- owner：所有者属性，该拦截器是属于哪个上层结构的。
+
+- flag：使用了共用体与结构体描述的一个拦截器标志位：
+  - again：是否需要重新处理。
+  
+  - redirects：重定向标志位，拦截器自动处理重定向的内容，这个操作对用户来说是透明的。
+  
+  - retry：重新尝试。保留未用。
+  
+  - authenticate：需要认证。
+ 
+  - chunked：接收的数据是分块的。
+  
+  - chunked_complete：所有分块数据接收完毕。
+  
+  - complete：数据接收完成。
+  
+  - keep_alive：指定长连接。
 
 
 ## 外部函数
 
-- 拦截器初始化，主要实现的功能有：为**网卡结构**分配内存空间、初始化**HTTP请求/响应**相关数据结构、为**HTTP报文message**分配内存空间。
+- 拦截器初始化，主要实现的功能有：为**网卡结构**分配内存空间、初始化**HTTP请求/响应**相关数据结构、初始化**HTTP回调事件evetn**、为**HTTP报文message**分配内存空间、为**HTTP解析器parser、parser_settings**分配相关的内存空间并且初始它们。
 
 ```c
 int http_interceptor_init(http_interceptor_t *interceptor)
 ```
+
+- 拦截器的释放操作，因为在处理HTTP的时候会动态分配非常多的内存空间，在最后应该要回收它们，注意，此函数不仅回收了**http_interceptor_init()**函数分配的内存空间，还会回收在**处理HTTP请求、应答、解析**时候动态申请的内存空间。
+
+```c
+int http_interceptor_release(http_interceptor_t *interceptor);
+```
+
+- 设置拦截器的所有者属性，指定拦截器归属谁所有，可以为NULL，但一般不为NULL。
+
+```c
+void http_interceptor_set_owner(http_interceptor_t *interceptor, void *owner);
+```
+
+- 注册回调函数事件，在合适的时候会通过回调函数告知上层，一般来说在回调函数中需要判断是何种事件产生的回调，决定是否需要处理，回调函数的类型是**http_event_cb_t**，详细内容查看[HTTP回调事件](./event.md)。
+
+```c
+void http_interceptor_event_register(http_interceptor_t *interceptor, http_event_cb_t cb);
+```
+
+
 
 - 拦截器设置连接参数。
 
@@ -95,7 +148,9 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
 int http_interceptor_process(http_interceptor_t *interceptor,
                              http_connect_params_t *connect_params,
                              http_request_method_t mothod, 
-                             const char *post_buf);
+                             const char *post_buf,
+                             void *owner,
+                             http_event_cb_t cb);
 ```
 
 
@@ -122,6 +177,26 @@ static void _http_interceptor_set_status(http_interceptor_t *interceptor, http_i
 
 static http_interceptor_status_t _http_interceptor_get_status(http_interceptor_t *interceptor)
 ```
+
+- 设置解析器的回调函数，注意这些是内部的处理函数。
+
+```c
+static int _http_interceptor_parser_setting(http_interceptor_t *interceptor)
+{
+    interceptor->parser_settings->on_url = _http_on_url;
+    interceptor->parser_settings->on_status = _http_on_status;
+    interceptor->parser_settings->on_header_field = _http_on_header_field;
+    interceptor->parser_settings->on_header_value = _http_on_header_value;
+    interceptor->parser_settings->on_headers_complete = _http_on_headers_complete;
+    interceptor->parser_settings->on_message_begin = _http_on_message_begin;
+    interceptor->parser_settings->on_message_complete = _http_on_message_complete;
+    interceptor->parser_settings->on_body = _http_on_body;
+    interceptor->parser_settings->on_chunk_header = _http_on_chunk_header;
+    interceptor->parser_settings->on_chunk_complete = _http_on_chunk_complete;
+    interceptor->parser->data = interceptor;
+}
+```
+
 
 
 **上一篇**： [HTTP响应](./response.md)

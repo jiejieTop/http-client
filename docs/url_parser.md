@@ -43,6 +43,6 @@ int http_url_parsing(http_connect_params_t *connect_params, const char *url)
 - [http_utils.c](./utils.md) ：http_utils_assign_string()、
 
 
-**上一篇**：[通用组件功能](./general.md)
+**上一篇**：[HTTP回调事件](./event.md)
 
 **下一篇**： [HTTP报文处理](./message_buffer.md)

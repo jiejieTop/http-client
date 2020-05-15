@@ -139,10 +139,16 @@ typedef struct http_request {
 
 ## 外部函数
 
-- http请求初始化，主要是为请求报文分配内存空间。
+- http请求初始化，主要是为请求报文分配内存空间，比如请求起始行、首部字段、主体字段，调用的是**http_message_buffer_init()**函数。
 
 ```c
 int http_request_init(http_request_t *req)
+```
+
+- http请求结构释放，因为在初始化时通过**http_message_buffer_init()**函数动态分配了内存空间，此时要释放它。
+
+```c
+int http_request_release(http_request_t *req);
 ```
 
 - http请求报文头部字段初始化，设置请求头部索引`header_index`的值为0，主要填充默认的头部字段，比如默认的长连接`Connection: Keep-Alive`，接受的数据类型`Accept: */* `等。
