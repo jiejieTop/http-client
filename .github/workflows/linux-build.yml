@@ -19,3 +19,5 @@ jobs:
       run: ./build.sh
     - name: runnig test
       run: ./build/bin/http-client
+    - name: remove trash
+      run: rm -rf build *.png
