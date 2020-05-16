@@ -2,12 +2,12 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-15 16:24:49
- * @LastEditTime: 2020-05-15 17:46:51
+ * @LastEditTime: 2020-05-16 10:52:48
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 
-#ifndef _HTTP_ROUTING_H_
-#define _HTTP_ROUTING_H_
+#ifndef _ROUTING_H_
+#define _ROUTING_H_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -22,16 +22,16 @@
  * --------------------------------------------------
  */
 
-typedef struct http_routing {
+typedef struct routing {
     uint32_t            hash;
     char                *host;
     char                *ip;
-} http_routing_t;
+} routing_t;
 
-
-
+void routing_record(const char* host, const char *ip);
+char *routing_search(const char* host);
  
 
 
-#endif // !_HTTP_ROUTING_H_
+#endif // !_ROUTING_H_
 

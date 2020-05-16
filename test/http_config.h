@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 00:42:16
- * @LastEditTime: 2020-05-15 21:56:14
+ * @LastEditTime: 2020-05-16 09:19:03
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_CONFIG_H_
@@ -30,7 +30,7 @@
 #define     HTTP_YES                            1
 
 #define     HTTP_DEFAULT_BUF_SIZE               1024
-#define     HTTP_DEFAULT_CMD_TIMEOUT            4000
+#define     HTTP_DEFAULT_CMD_TIMEOUT            10000
 #define     HTTP_MAX_CMD_TIMEOUT                20000
 #define     HTTP_MIN_CMD_TIMEOUT                1000
 #define     HTTP_KEEP_ALIVE_INTERVAL            20      // unit: second

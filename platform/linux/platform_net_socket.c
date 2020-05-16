@@ -2,23 +2,29 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-01-10 23:45:59
- * @LastEditTime: 2020-05-10 16:48:15
+ * @LastEditTime: 2020-05-16 16:12:42
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
+#include <routing.h>
 #include "platform_net_socket.h"
 
 int platform_net_socket_connect(const char *host, const char *port, int proto)
 {
     int fd, ret = HTTP_SOCKET_UNKNOWN_HOST_ERROR;
     struct addrinfo hints, *addr_list, *cur;
-    
+    char ip[16] = {0};
+    const char *host_ip = NULL;
+
+    if ((host_ip = routing_search(host)) == NULL)
+        host_ip = host;
+
     /* Do name resolution with both IPv6 and IPv4 */
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = (proto == PLATFORM_NET_PROTO_UDP) ? SOCK_DGRAM : SOCK_STREAM;
     hints.ai_protocol = (proto == PLATFORM_NET_PROTO_UDP) ? IPPROTO_UDP : IPPROTO_TCP;
     
-    if (getaddrinfo(host, port, &hints, &addr_list) != 0) {
+    if (getaddrinfo(host_ip, port, &hints, &addr_list) != 0) {
         return ret;
     }
     
@@ -31,6 +37,12 @@ int platform_net_socket_connect(const char *host, const char *port, int proto)
 
         if (connect(fd, cur->ai_addr, cur->ai_addrlen) == 0) {
             ret = fd;
+
+            inet_ntop(cur->ai_family, &(((struct sockaddr_in *)(cur->ai_addr))->sin_addr), ip, 16);
+            if (NULL != ip) {
+                routing_record(host, ip);
+            }
+
             break;
         }
 

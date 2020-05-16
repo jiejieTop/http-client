@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:30:54
- * @LastEditTime: 2020-05-15 23:17:33
+ * @LastEditTime: 2020-05-16 16:11:24
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_timer.h"
@@ -56,9 +56,6 @@ int network_init(network_t *n, const char *addr, const char *port, const char *c
     n->addr = addr;
     n->port = port;
     n->channel = 0;
-
-    // if (NULL == n->ip)
-    //     n->ip = platform_memory_alloc(16);      /* save ip */
 
 #ifndef HTTP_NETWORK_TYPE_NO_TLS
     if (NULL != ca) {

@@ -18,7 +18,6 @@ typedef struct network {
     int                         channel;        /* tcp or tls */
     const char                  *addr;
     const char                  *port;
-    char                        *ip;
 #ifndef HTTP_NETWORK_TYPE_NO_TLS
     const char		            *ca_crt;
     size_t 		                ca_crt_len;
