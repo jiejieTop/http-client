@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 00:42:16
- * @LastEditTime: 2020-05-16 09:19:03
+ * @LastEditTime: 2020-05-16 21:43:05
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_CONFIG_H_
@@ -10,7 +10,7 @@
 
 #define             LOG_IS_SALOF
 
-#define             LOG_LEVEL                   DEBUG_LEVEL   //WARN_LEVEL DEBUG_LEVEL INFO_LEVEL
+#define             LOG_LEVEL                   INFO_LEVEL   //WARN_LEVEL DEBUG_LEVEL INFO_LEVEL
 
 #ifdef LOG_IS_SALOF
     #define         USE_LOG                     (1U)
