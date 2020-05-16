@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-15 16:13:37
+ * @LastEditTime: 2020-05-16 17:52:15
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -113,9 +113,10 @@ int _http_client_handle(const char *url, void *data, http_request_method_t opt, 
     http_client_release(c);
 }
 
-int http_client_init(void)
+int http_client_init(const char *ca)
 {
     _http_client_pool_init();
+    http_interceptor_set_ca(ca);
 }
 
 
@@ -160,5 +161,4 @@ int http_client_post(const char *url, void *data, http_event_cb_t cb)
 {
     return _http_client_handle(url, data, HTTP_REQUEST_METHOD_POST, cb);
 }
-
 

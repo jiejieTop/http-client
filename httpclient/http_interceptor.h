@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-15 16:15:34
+ * @LastEditTime: 2020-05-16 18:32:25
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -58,6 +58,7 @@ typedef struct http_interceptor {
 
 
 int http_interceptor_init(http_interceptor_t *interceptor);
+void http_interceptor_set_ca(const char *ca);
 void http_interceptor_set_owner(http_interceptor_t *interceptor, void *owner);
 void http_interceptor_event_register(http_interceptor_t *interceptor, http_event_cb_t cb);
 int http_interceptor_connect(http_interceptor_t *interceptor);
@@ -70,6 +71,5 @@ int http_interceptor_process(http_interceptor_t *interceptor,
                              void *post_buf,
                              void *owner,
                              http_event_cb_t cb);
-
 
 #endif // !_HTTP_INTERCEPTOR_H_

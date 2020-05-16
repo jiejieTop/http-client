@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-16 09:25:15
+ * @LastEditTime: 2020-05-16 22:44:56
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -16,6 +16,7 @@
 #include <platform_memory.h>
 #include <platform_timer.h>
 
+static const char *_http_interceptor_ca = NULL;
 
 static int _http_read_buffer(http_interceptor_t *interceptor, http_message_buffer_t *buf, int length)
 {
@@ -41,7 +42,7 @@ static int _http_read_buffer(http_interceptor_t *interceptor, http_message_buffe
                             length,
                             platform_timer_remain(&timer));
 
-        http_message_buffer_concat(buf, interceptor->message->data, NULL);
+        http_message_buffer_append(buf, interceptor->message->data, len);
 
         read_len += len;
 
@@ -105,7 +106,7 @@ static int _http_interceptor_set_network(http_interceptor_t *interceptor)
                         NULL);
     
     if (http_utils_ignore_case_match(http_get_connect_params_scheme(interceptor->connect_params), "https") == 0) {
-        network_set_ca(interceptor->network, ca_get());
+        network_set_ca(interceptor->network, _http_interceptor_ca);
     }
 
     if (HTTP_SUCCESS_ERROR == res) {
@@ -132,7 +133,7 @@ static int _http_on_status(http_parser *parser, const char *at, size_t length)
 static int _http_on_header_field(http_parser *parser, const char *at, size_t length)
 {
     http_interceptor_t *interceptor = parser->data;
-    // printf("Header field: %.*s\n", (int)length, at);
+    // printf("%.*s :", (int)length, at);
 
     if(0 == http_utils_ignore_case_nmatch(at, "Location", 8)) {
         interceptor->flag.flag_t.redirects = 1;
@@ -154,7 +155,7 @@ static int _http_on_header_value(http_parser *parser, const char *at, size_t len
         interceptor->flag.flag_t.redirects = 0;
     }
 
-    // printf("Header value:%.*s\n", (int)length, at);
+    // printf("%.*s\n", (int)length, at);
     return 0;
 }
 
@@ -177,7 +178,7 @@ static int _http_on_headers_complete(http_parser *parser)
 static int _http_on_message_begin(http_parser *parser)
 {
     http_interceptor_t *interceptor = parser->data;
-    // HTTP_LOG_D("_http_on_message_begin");
+    HTTP_LOG_D("_http_on_message_begin");
     http_event_dispatch(interceptor->evetn, http_event_type_on_response, interceptor, NULL, 0);
     return 0;
 }
@@ -186,7 +187,7 @@ static int _http_on_message_complete(http_parser *parser)
 {
     http_interceptor_t *interceptor = parser->data;
 
-    // HTTP_LOG_D("_http_on_message_complete");
+    HTTP_LOG_D("_http_on_message_complete");
 
     if (0!= interceptor->flag.flag_t.chunked)
         interceptor->flag.flag_t.chunked_complete = 1;
@@ -314,6 +315,11 @@ int http_interceptor_init(http_interceptor_t *interceptor)
         RETURN_ERROR(res);
     
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
+}
+
+void http_interceptor_set_ca(const char *ca)
+{
+    _http_interceptor_ca = ca;
 }
 
 void http_interceptor_set_owner(http_interceptor_t *interceptor, void *owner)
