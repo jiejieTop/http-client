@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:30:54
- * @LastEditTime: 2020-05-16 16:11:24
+ * @LastEditTime: 2020-05-17 20:51:33
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_timer.h"
@@ -68,7 +68,7 @@ int network_init(network_t *n, const char *addr, const char *port, const char *c
 
 void network_release(network_t* n)
 {
-    if (n->socket)
+    if (n->socket >= 0)
         network_disconnect(n);
 
     memset(n, 0, sizeof(network_t));

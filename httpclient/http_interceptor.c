@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-17 13:23:59
+ * @LastEditTime: 2020-05-17 23:15:22
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -370,6 +370,7 @@ int http_interceptor_connect(http_interceptor_t *interceptor)
         _http_interceptor_set_status(interceptor, http_interceptor_status_connect);
         HTTP_LOG_D("interceptor connect success ...\n");
     } else {
+        HTTP_LOG_D("interceptor connect fail ...\n");
         _http_interceptor_set_status(interceptor, http_interceptor_status_release);
     }
 
@@ -462,6 +463,9 @@ int http_interceptor_fetch_headers(http_interceptor_t *interceptor)
 
     HTTP_ROBUSTNESS_CHECK(interceptor, 0);
     
+    if (http_interceptor_status_request != _http_interceptor_get_status(interceptor))
+        RETURN_ERROR(HTTP_SUCCESS_ERROR);
+
     _http_interceptor_set_status(interceptor, http_interceptor_status_response_headers);
 
     while (http_interceptor_status_response_headers == _http_interceptor_get_status(interceptor)) {
@@ -542,7 +546,7 @@ int http_interceptor_fetch_data(http_interceptor_t *interceptor)
         RETURN_ERROR(len);
 
     do {
-        len = _http_read_buffer(interceptor, interceptor->buffer_len);
+        len = _http_read_buffer(interceptor, (http_response_get_length(&interceptor->response) - interceptor->data_process));
         
         if (len <= 0) {
             return -1;

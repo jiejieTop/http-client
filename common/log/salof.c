@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-27 23:10:36
- * @LastEditTime : 2020-01-16 00:37:56
+ * @LastEditTime: 2020-05-17 20:41:03
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 /** synchronous asynchronous log output framework */
@@ -38,10 +38,13 @@ void salof_task(void *parm);
 #endif
 #endif
 
-static char _format_buff[SALOF_BUFF_SIZE];
+static char _format_buff[SALOF_BUFF_SIZE] = {0};
 
 int salof_init(void)
 {
+    memset(_format_buff, 0, SALOF_BUFF_SIZE);
+    memset(_out_buff, 0, SALOF_BUFF_SIZE);
+
 #if USE_SALOF
     _salof_fifo = fifo_create(SALOF_FIFO_SIZE);
     if(_salof_fifo == NULL)
