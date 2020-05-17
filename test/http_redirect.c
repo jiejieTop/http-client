@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-16 22:40:21
- * @LastEditTime: 2020-05-16 22:58:36
+ * @LastEditTime: 2020-05-17 13:29:53
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 
@@ -22,8 +22,9 @@ static int _http_cb(void *e)
 {
     http_event_t *event = e;
 
-    printf("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\nlen:%ld, data:\n\n"
-           "%s\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n", event->len, (char*)event->data);
+    printf("%s", (char*)event->data);
+
+    return 0;
 }
 
 void http_redirect_test(void)
@@ -32,9 +33,13 @@ void http_redirect_test(void)
 
     http_client_init(ca_get());
     
+    printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
     http_client_get(URL1, _http_cb);
+    printf("\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
+    printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
     http_client_get(URL2, _http_cb);
+    printf("\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
     printf("\n---------------------- http_redirect_test end ----------------------\n");
 

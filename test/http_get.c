@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-16 22:23:05
- * @LastEditTime: 2020-05-16 22:58:45
+ * @LastEditTime: 2020-05-17 13:28:13
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <stdio.h>
@@ -19,8 +19,9 @@ static int _http_cb(void *e)
 {
     http_event_t *event = e;
 
-    printf("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\nlen:%ld, data:\n\n"
-           "%s\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n", event->len, (char*)event->data);
+    printf("%s", (char*)event->data);
+
+    return 0;
 }
 
 void http_get_test(void)
@@ -29,11 +30,17 @@ void http_get_test(void)
 
     http_client_init(ca_get());
     
+    printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
     http_client_get(URL1, _http_cb);
+    printf("\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
+    printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
     http_client_get(URL2, _http_cb);
+    printf("\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
+    printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
     http_client_get(URL3, _http_cb); 
+    printf("\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
     printf("\n---------------------- http_get_test end ----------------------\n");
 }
