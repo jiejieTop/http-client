@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-16 22:44:56
+ * @LastEditTime: 2020-05-17 13:23:59
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -18,37 +18,24 @@
 
 static const char *_http_interceptor_ca = NULL;
 
-static int _http_read_buffer(http_interceptor_t *interceptor, http_message_buffer_t *buf, int length)
+static int _http_read_buffer(http_interceptor_t *interceptor, size_t length)
 {
     int len = 0;
-    int read_len = 0;
-
     platform_timer_t timer;
-    HTTP_ROBUSTNESS_CHECK((interceptor && buf), HTTP_NULL_VALUE_ERROR);
 
-    if ((0 == length) || (length > interceptor->message->length))
-        length = interceptor->message->length;
+    HTTP_ROBUSTNESS_CHECK(interceptor, HTTP_NULL_VALUE_ERROR);
+
+    if ((0 == length) || (length > interceptor->buffer_len))
+        length = interceptor->buffer_len;
     
-    http_message_buffer_reinit(interceptor->message);
+    memset(interceptor->buffer, 0, interceptor->buffer_len);
 
-    do {
-        memset(interceptor->message->data, 0, length);
+    platform_timer_init(&timer);
+    platform_timer_cutdown(&timer, interceptor->cmd_timeout);
 
-        platform_timer_init(&timer);
-        platform_timer_cutdown(&timer, interceptor->cmd_timeout);
+    len = network_read(interceptor->network, interceptor->buffer, length, platform_timer_remain(&timer));
 
-        len = network_read( interceptor->network, 
-                            interceptor->message->data, 
-                            length,
-                            platform_timer_remain(&timer));
-
-        http_message_buffer_append(buf, interceptor->message->data, len);
-
-        read_len += len;
-
-    } while (len == length);    /* read again, there may be data */
-
-    RETURN_ERROR(read_len);
+    RETURN_ERROR(len);
 }
 
 static int _http_write_buffer(http_interceptor_t *interceptor, unsigned char *buf, int length)
@@ -167,7 +154,8 @@ static int _http_on_headers_complete(http_parser *parser)
     http_response_set_offset(&interceptor->response, parser->nread);
     http_response_set_length(&interceptor->response, parser->content_length);
 
-    // HTTP_LOG_D("_http_on_headers_complete, status=%d, offset=%d, nread=%d", parser->status_code, interceptor->response.offset, parser->nread);
+    // HTTP_LOG_I("_http_on_headers_complete, status=%d, offset=%d, nread=%d, content_length = %d\n", 
+    //             parser->status_code, interceptor->response.offset, parser->nread, parser->content_length);
 
     http_event_dispatch(interceptor->evetn, http_event_type_on_headers, interceptor, NULL, 0);
 
@@ -201,7 +189,9 @@ static int _http_on_body(http_parser *parser, const char *at, size_t length)
 {
     http_interceptor_t *interceptor = parser->data;
 
-    // HTTP_LOG_D("Body len: %d, %s\n", (int)length, at);
+    // HTTP_LOG_W("data_process len: %d\n", (int)length);
+
+    interceptor->data_process += length;
 
     http_event_dispatch(interceptor->evetn, http_event_type_on_body, interceptor, (void *)at, length);
     return 0;
@@ -300,15 +290,21 @@ int http_interceptor_init(http_interceptor_t *interceptor)
     http_response_init(&interceptor->response);
 
     interceptor->cmd_timeout = HTTP_DEFAULT_CMD_TIMEOUT;
-    interceptor->message_len = HTTP_DEFAULT_BUF_SIZE;
-
+    interceptor->buffer_len = HTTP_DEFAULT_BUF_SIZE;
+    interceptor->data_process = 0;
+    interceptor->flag.all_flag = 0;
+    interceptor->owner = NULL;
+    
     if (NULL == interceptor->evetn)
         interceptor->evetn = http_event_init();
     
     if (NULL == interceptor->message)
-        interceptor->message = http_message_buffer_init(interceptor->message_len);
-    
-    HTTP_ROBUSTNESS_CHECK((interceptor->message), HTTP_MEM_NOT_ENOUGH_ERROR);
+        interceptor->message = http_message_buffer_init(0);
+
+    if (NULL == interceptor->buffer)
+        interceptor->buffer = platform_memory_alloc(interceptor->buffer_len);
+
+    HTTP_ROBUSTNESS_CHECK((interceptor->message && interceptor->buffer), HTTP_MEM_NOT_ENOUGH_ERROR);
 
     res = _http_interceptor_prepare(interceptor);
     if (HTTP_SUCCESS_ERROR != res)
@@ -380,8 +376,6 @@ int http_interceptor_connect(http_interceptor_t *interceptor)
     RETURN_ERROR(res);
 }
 
-
-
 int http_interceptor_request(http_interceptor_t *interceptor, http_request_method_t mothod, const char *post_buf)
 {
     int res = HTTP_SUCCESS_ERROR;
@@ -392,7 +386,7 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
 
     http_request_set_method(&interceptor->request, mothod);
 
-    if (NULL == interceptor->connect_params->http_query) {
+    if (NULL == http_get_connect_params_query(interceptor->connect_params)) {
         http_request_set_start_line(&interceptor->request, http_get_connect_params_path(interceptor->connect_params));
     } else {
         http_request_set_start_line_with_query(&interceptor->request, 
@@ -449,6 +443,12 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
         http_request_release(&interceptor->request);
 
         _http_interceptor_set_status(interceptor, http_interceptor_status_request);
+
+        if (interceptor->message) {
+            http_message_buffer_release(interceptor->message);
+            interceptor->message = NULL;
+        }
+
     } else {
         _http_interceptor_set_status(interceptor, http_interceptor_status_release);
     }
@@ -459,15 +459,21 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
 int http_interceptor_fetch_headers(http_interceptor_t *interceptor)
 {
     int len = 0;
-    HTTP_ROBUSTNESS_CHECK(interceptor, len);
-    
-    if (http_interceptor_status_request != _http_interceptor_get_status(interceptor))
-        RETURN_ERROR(len);
-    
-    len = _http_read_buffer(interceptor, http_response_get_message(&interceptor->response), HTTP_DEFAULT_BUF_SIZE);
 
-    if (len > 0)
-        _http_interceptor_set_status(interceptor, http_interceptor_status_response_headers);
+    HTTP_ROBUSTNESS_CHECK(interceptor, 0);
+    
+    _http_interceptor_set_status(interceptor, http_interceptor_status_response_headers);
+
+    while (http_interceptor_status_response_headers == _http_interceptor_get_status(interceptor)) {
+        
+        len = _http_read_buffer(interceptor, interceptor->buffer_len);
+
+        if (len <= 0) {
+            return -1;
+        } else {
+            http_parser_execute(interceptor->parser, interceptor->parser_settings, interceptor->buffer, len);
+        }
+    }
 
     RETURN_ERROR(len);
 }
@@ -527,6 +533,28 @@ int http_interceptor_release(http_interceptor_t *interceptor)
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
+int http_interceptor_fetch_data(http_interceptor_t *interceptor)
+{
+    int len = 0;
+    HTTP_ROBUSTNESS_CHECK(interceptor, len);
+    
+    if (http_interceptor_status_headers_complete != _http_interceptor_get_status(interceptor))
+        RETURN_ERROR(len);
+
+    do {
+        len = _http_read_buffer(interceptor, interceptor->buffer_len);
+        
+        if (len <= 0) {
+            return -1;
+        } else {
+            http_parser_execute(interceptor->parser, interceptor->parser_settings, interceptor->buffer, len);
+        }
+    } while ((interceptor->data_process < interceptor->response.length) ||
+            ((interceptor->flag.flag_t.chunked && !interceptor->flag.flag_t.chunked_complete)));
+
+    RETURN_ERROR(len);
+}
+
 
 int http_interceptor_process(http_interceptor_t *interceptor,
                              http_connect_params_t *connect_params,
@@ -560,19 +588,10 @@ int http_interceptor_process(http_interceptor_t *interceptor,
             case http_interceptor_status_request:
                 http_interceptor_fetch_headers(interceptor);
 
-            case http_interceptor_status_response_headers:
-                if (http_interceptor_status_response_headers != _http_interceptor_get_status(interceptor)) {
-                    _http_interceptor_set_status(interceptor, http_interceptor_status_release);
-                } else {
-                    http_parser_execute(interceptor->parser, 
-                                        interceptor->parser_settings, 
-                                        http_response_get_message_data(&interceptor->response),
-                                        http_response_get_message_len(&interceptor->response));
-                }
-
             case http_interceptor_status_headers_complete:
                 http_interceptor_check_response(interceptor);
-
+                http_interceptor_fetch_data(interceptor);
+            
             case http_interceptor_status_response_body:
             case http_interceptor_status_response_complete:
                 http_interceptor_submit_data(interceptor);

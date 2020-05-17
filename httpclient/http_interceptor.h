@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-16 18:32:25
+ * @LastEditTime: 2020-05-17 12:09:42
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -35,8 +35,10 @@ typedef struct http_interceptor {
     http_response_t             response;
     http_interceptor_status_t   status;
     http_message_buffer_t       *message;
-    uint16_t                    message_len;
-    uint16_t                    cmd_timeout;
+    char                        *buffer;
+    size_t                      buffer_len;
+    size_t                      cmd_timeout;
+    size_t                      data_process;
     struct http_parser          *parser;
     struct http_parser_settings *parser_settings;
     http_event_t                *evetn;
