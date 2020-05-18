@@ -1,3 +1,10 @@
+![C/C++ CI](https://github.com/jiejieTop/http-client/workflows/C/C++%20CI/badge.svg)
+[![issues](https://img.shields.io/github/issues/jiejieTop/http-client)](https://github.com/jiejieTop/http-client/issues)
+![forks](https://img.shields.io/github/forks/jiejieTop/http-client)
+![stars](https://img.shields.io/github/stars/jiejieTop/http-client)
+[![license](https://img.shields.io/github/license/jiejieTop/http-client)](https://github.com/jiejieTop/http-client/blob/master/LICENSE)
+![](https://img.shields.io/badge/platform-Linux|Windows|Mac|Embedded-orange.svg)
+
 
 ```
     __     __   __                       __ _               __ 
@@ -36,11 +43,15 @@
 
 - [平台抽象层—tls加密传输](./docs/platform_nettype_tls.md)
 
+- [路由](./docs/routing.md)
+
 - [network网卡](./docs/network.md)
 
 - [基础组件功能](./docs/utils.md)
 
 - [通用组件功能](./docs/general.md)
+
+- [HTTP回调事件](./docs/event.md)
 
 - [url解析器](./docs/url_parser.md)
 
@@ -52,7 +63,22 @@
 
 - [拦截器](./docs/interceptor.md)
 
+- [http-client](./docs/client.md)
+
 - [如何提交PR？](./docs/how_to_pr.md)
+
+## 测试代码 & 文档
+
+- [url解析测试](./docs/test_url_parser.md)
+
+- [get方法测试](./docs/test_get.md)
+
+- [post方法测试](./docs/test_post.md)
+
+- [重定向测试](./docs/test_redirect.md)
+
+- [获取文件测试](./docs/test_get_file.md)
+
 
 ## 参与开发
 
