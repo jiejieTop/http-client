@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-16 22:23:05
- * @LastEditTime: 2020-05-17 23:14:58
+ * @LastEditTime: 2020-05-18 17:03:05
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <stdio.h>
@@ -13,11 +13,11 @@ extern const char *ca_get();
 
 #define URL1 "http://httpbin.org/image/png"       // tcp
 #define URL2 "https://httpbin.org/image/png"       // tls
-#define URL3 "http://www.jiedev.com/kawaii.zip"
+#define URL3 "https://dldir1.qq.com/weixin/Windows/WeChatSetup.exe"
 
 #define FILE_NAME1  "pig1.png"
 #define FILE_NAME2  "pig2.png"
-#define FILE_NAME3  "kawaii.zip"
+#define FILE_NAME3  "WeChatSetup.exe"
 
 static char buf[102]={'\0'};
 
@@ -56,8 +56,10 @@ static int _http_cb1(void *e)
     if (event->len <= 0)
         return -1;
 
-    if (NULL == pbuf1)
+    if (NULL == pbuf1) {
+        printf("\nfile size : %ld KB\n", pbuf1_len);
         pbuf1 = platform_memory_alloc(pbuf1_len);
+    }
     
     memcpy(pbuf1 + process_len, event->data, event->len);
 
@@ -80,8 +82,10 @@ static int _http_cb2(void *e)
     if (event->len <= 0)
         return -1;
 
-    if (NULL == pbuf2)
+    if (NULL == pbuf2) {
+        printf("\nfile size : %ld KB\n", pbuf2_len);
         pbuf2 = platform_memory_alloc(pbuf2_len);
+    }
     
     memcpy(pbuf2 + process_len, event->data, event->len);
 
@@ -104,8 +108,10 @@ static int _http_cb3(void *e)
     if (event->len <= 0)
         return -1;
 
-    if (NULL == pbuf3)
+    if (NULL == pbuf3) {
+        printf("\nfile size : %ld KB\n", pbuf3_len);
         pbuf3 = platform_memory_alloc(pbuf3_len);
+    }
     
     memcpy(pbuf3 + process_len, event->data, event->len);
 
