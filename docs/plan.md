@@ -4,7 +4,7 @@
 
 框架如下：
 
-![http-client框架](http://qiniu.jiejie01.top/httpclient.png)
+![http-client架构](../png/httpclient.png)
 
 ## 平台抽象层
 

@@ -44,7 +44,7 @@ void http_redirect_test(void)
 
 ## 现象
 
-从代码我们很明显可以看出，我们访问的是**httpbin.org**这个服务器，但是此时资源已经被挪移到**www.jiedev.com**服务器了（纯粹是为了测试，并非真正挪移），那么拦截器就要从**www.jiedev.com**服务器获取新的资源。
+从代码我们很明显可以看出，我们访问的是**httpbin.org**这个服务器，但是此时资源已经被挪移到 `www.jiedev.com` 服务器了（纯粹是为了测试，并非真正挪移），那么拦截器就要从 `www.jiedev.com` 服务器获取新的资源。
 
 ```bash
 ---------------------- http_redirect_test start ----------------------
