@@ -31,7 +31,7 @@ typedef struct http_connect_params {
 
 ```c
 int http_url_parsing(http_connect_params_t *connect_params, const char *url)
-``
+```
 
 ## 内部函数
 
@@ -40,7 +40,7 @@ int http_url_parsing(http_connect_params_t *connect_params, const char *url)
 
 - [http_parser.c]() ：http_parser_parse_url()
 
-- [http_utils.c](./utils.md) ：http_utils_assign_string()、
+- [http_utils.c](./utils.md) ：http_utils_assign_string()
 
 
 **上一篇**：[HTTP回调事件](./event.md)

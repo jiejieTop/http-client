@@ -10,66 +10,57 @@
 ## 数据结构
 
 ```c
-#ifdef HTTP_NETWORK_TYPE_TLS
-typedef struct network_ssl_params {
+typedef struct network {
+    int                         socket;
+    int                         channel;        /* tcp or tls */
+    const char                  *addr;
+    const char                  *port;
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
     const char		            *ca_crt;
     size_t 		                ca_crt_len;
-#if defined(MBEDTLS_FS_IO)
-    const char                  *cert_file;            // public certificate file
-    const char                  *key_file;             // pravite certificate file
-#else
-#if defined(MBEDTLS_KEY_EXCHANGE__SOME__PSK_ENABLED)
-    const char                  *psk;                  // PSK string
-    const char                  *psk_id;               // PSK ID
-    size_t                      psk_length;            // PSK length
-#endif
-#endif
     unsigned int                timeout_ms;            // SSL handshake timeout in millisecond
-} network_ssl_params_t;
-#endif /* HTTP_NETWORK_TYPE_TLS */
-
-
-typedef struct network_params {
-    char                        *addr;
-    char                        *port;
-#ifdef HTTP_NETWORK_TYPE_TLS
-    network_ssl_params_t        network_ssl_params;
     void                        *nettype_tls_params;
-#endif /* HTTP_NETWORK_TYPE_TLS */
-} network_params_t;
-
-
-typedef struct network {
-    int                     socket;
-    network_params_t        network_params;
-    int                     (*connect)(struct network *);
-    void                    (*disconnect)(struct network *);
-    int                     (*read)(struct network *, unsigned char *, int, int);
-    int                     (*write)(struct network *, unsigned char *, int, int);
+#endif
 } network_t;
 ```
 
-- 封装了`ssl`相关的参数`network_ssl_params_t`，目前暂时只有`mbedtls`的，`openssl`在后续完善实现。
+- 封装了`ssl`相关的参数`nettype_tls_params`，目前暂时只有`mbedtls`的，`openssl`在后续完善实现。
 
-- 封装了网卡的参数`network_params_t`，比如要连接的`addr`、`port`等。
+- 自动选择数据通道`channel`，比如tcp直连或者tls加密。
 
-- 网卡`network_t`设备，记录`socket`描述符，提供`connect、disconnect、read、write`等操作。
+- 封装了网卡的参数，比如要连接的`addr`、`port`等。
+
+- 记录`socket`描述符，向上层提供`connect、disconnect、read、write`等操作。
+
+- 还有ca证书、长度、tls握手时间等`ca_crt`、 `ca_crt_len` 、`timeout_ms`。
 
 ## 外部函数
 
-- 网卡初始化，设置相关参数。
+- 网卡初始化，设置相关参数，**IP地址**，**端口号**，如果是**tls**数据通道的话还要指定**ca证书**，如果指定了**ca证书**，这里它会**自动选择tls数据通道**的。
 
 ```c
-int network_init(network_t* n, network_params_t* network_params)
+int network_init(network_t *n, const char *addr, const char *port, const char *ca);
 ```
 
-- 从底层读数据，指定数据存储区域`buf`、数据长度`len`、读超时的时间`timeout`。
+- 设置ca证书。
+
+```c
+int network_set_ca(network_t *n, const char *ca);
+```
+
+- 设置数据通道。
+
+```c
+int network_set_channel(network_t *n, int channel);
+```
 
 - network设置目标主机地址与端口号。
 
 ```c
 int network_set_addr_port(network_t* n, char *addr, char *port)
 ```
+
+- 从底层读数据，指定数据存储区域`buf`、数据长度`len`、读超时的时间`timeout`。
 
 ```c
 int network_read(network_t* n, unsigned char* buf, int len, int timeout)
@@ -93,10 +84,10 @@ int network_connect(network_t* n)
 void network_release(network_t* n)
 ```
 
-**注意**：以上的这些函数都会根据配置指定的数据通道选择不同的传输方式，当使用加密传输则通过tls通道，否则就使用tcp直连的方式，可以参考框架图。
+**注意**：以上的这些函数都会自动选择不同的传输方式，当使用加密传输则通过**tls通道**，否则就使用**tcp直连**的方式，可以参考框架图。
 
 
-**上一篇**：[平台抽象层—tls加密传输](./platform_nettype_tls.md)
+**上一篇**：[路由选择](./routing.md)
 
 **下一篇**： [基础组件功能](./utils.md)
 

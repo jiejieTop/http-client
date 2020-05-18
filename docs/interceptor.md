@@ -32,8 +32,10 @@ typedef struct http_interceptor {
     http_response_t             response;
     http_interceptor_status_t   status;
     http_message_buffer_t       *message;
-    uint16_t                    message_len;
-    uint16_t                    cmd_timeout;
+    char                        *buffer;
+    size_t                      buffer_len;
+    size_t                      cmd_timeout;
+    size_t                      data_process;
     struct http_parser          *parser;
     struct http_parser_settings *parser_settings;
     http_event_t                *evetn;
@@ -64,9 +66,13 @@ typedef struct http_interceptor {
 
 - status：状态，描述拦截器当前的处理状态。
 
-- message：HTTP报文缓冲区，用于存储读写时的报文内容，比如在HTTP请求的时候，它保存了HTTP请求报文的起始行、头部、主体等内容，在HTTP响应的时候，接收响应报文的数据，并将其拷贝到`interceptor->response.message`中保存起来，实现了动态接收 **1 ~ n** 字节的HTTP响应数据。
+- message：HTTP报文缓冲区，用于存储写数据时的报文内容，比如在HTTP请求的时候，它保存了HTTP请求报文的起始行、头部、主体等内容。
 
-- message_len：可以由用户指定的报文缓冲区长度，默认值是`HTTP_DEFAULT_BUF_SIZE`。
+- buffer：接收数据缓冲区，接收完数据就递交到上层去。
+
+- buffer_len：可以由用户指定的报文缓冲区长度，默认值是`HTTP_DEFAULT_BUF_SIZE`。
+
+- data_process：已经处理的数据长度。
 
 - cmd_timeout:可以由用户指定的超时时间，默认值是`HTTP_DEFAULT_CMD_TIMEOUT`。
 
@@ -110,6 +116,12 @@ int http_interceptor_init(http_interceptor_t *interceptor)
 int http_interceptor_release(http_interceptor_t *interceptor);
 ```
 
+- 设置ca证书
+
+```c
+void http_interceptor_set_ca(const char *ca);
+```
+
 - 设置拦截器的所有者属性，指定拦截器归属谁所有，可以为NULL，但一般不为NULL。
 
 ```c
@@ -121,7 +133,6 @@ void http_interceptor_set_owner(http_interceptor_t *interceptor, void *owner);
 ```c
 void http_interceptor_event_register(http_interceptor_t *interceptor, http_event_cb_t cb);
 ```
-
 
 
 - 拦截器设置连接参数。
@@ -148,7 +159,7 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
 int http_interceptor_process(http_interceptor_t *interceptor,
                              http_connect_params_t *connect_params,
                              http_request_method_t mothod, 
-                             const char *post_buf,
+                             void *post_buf,
                              void *owner,
                              http_event_cb_t cb);
 ```
@@ -158,13 +169,13 @@ int http_interceptor_process(http_interceptor_t *interceptor,
 
 与网卡相关的**读/写**数据操作：
 
-- 读数据，支持接收任意字节的数据内容，动态处理内存空间。
+- 读数据。
 
 ```c
-static int _http_read_buffer(http_interceptor_t *interceptor, http_message_buffer_t *buf, int length)
+static int _http_read_buffer(http_interceptor_t *interceptor, size_t length)
 ```
 
-- 写数据
+- 写数据。
 
 ```c
 static int _http_write_buffer(http_interceptor_t *interceptor, unsigned char *buf, int length)
@@ -201,5 +212,5 @@ static int _http_interceptor_parser_setting(http_interceptor_t *interceptor)
 
 **上一篇**： [HTTP响应](./response.md)
 
-**下一篇**： [待定](./interceptor.md)
+**下一篇**： [httpclient](./client.md)
 

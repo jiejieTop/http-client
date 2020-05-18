@@ -35,5 +35,4 @@ void platform_nettype_tls_disconnect(network_t* n)
 
 **上一篇**：[平台抽象层—tcp直连](./platform_nettype_tcp.md)
 
-**下一篇**： [network网卡](./network.md)
-
+**下一篇**： [路由选择](./routing.md)

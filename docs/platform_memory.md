@@ -1,8 +1,8 @@
 # 平台抽象层——内存管理
 
-- platform_mutex.c
+- platform_memory.c
 
-- platform_mutex.h
+- platform_memory.h
 
 根据不同平台的处理抽象不同的处理，进而满足对上层统一的内存管理操作。
 
