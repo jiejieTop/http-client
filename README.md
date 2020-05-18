@@ -21,7 +21,7 @@
 
 整体框架如下：
 
-![http-client框架](http://qiniu.jiejie01.top/httpclient.png)
+![http-client架构](./png/httpclient.png)
 
 ## 文档说明
 
