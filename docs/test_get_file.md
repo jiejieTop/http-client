@@ -2,6 +2,10 @@
 
 通过url去获取相关的资源文件并且将其写到文件中，文件的处理逻辑是自己写的，核心还是**http_client_get()**函数。
 
+## 动态图演示
+
+![http](http://qiniu.jiejie01.top/http.gif)
+
 ## 代码
 
 ```c

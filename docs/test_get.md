@@ -2,6 +2,10 @@
 
 主要验证**http**的**get方法**，此处测试了3个url，有tcp直连方式也有tls加密方式，均是正常的。
 
+## 动态图演示
+
+![get](http://qiniu.jiejie01.top/get.gif)
+
 ## 代码
 
 ```c

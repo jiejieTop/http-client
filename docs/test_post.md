@@ -2,6 +2,10 @@
 
 主要验证**http**的**post方法**，此处测试了2个url，有tcp直连方式也有tls加密方式，均是正常的，**httpbin.org**这个网站就是用于测试http协议的利器。
 
+## 动态图演示
+
+![post](http://qiniu.jiejie01.top/post.gif)
+
 ## 代码
 
 ```c

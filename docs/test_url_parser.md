@@ -2,6 +2,10 @@
 
 通过查看解析的url，判断解析是否正常。
 
+## 动态图演示
+
+![url_parsing](http://qiniu.jiejie01.top/url_parsing.gif)
+
 ## 代码
 
 ```c
