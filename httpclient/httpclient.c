@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-16 17:52:15
+ * @LastEditTime: 2020-05-19 20:44:34
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -18,12 +18,16 @@
 
 static http_list_t _http_client_free_list;
 static http_list_t _http_client_used_list;
+static platform_mutex_t _client_pool_lock;
 
 static int _http_client_internal_event_handle(void *e)
 {
     http_event_t *event = e;
     http_interceptor_t *interceptor = event->context;
     http_client_t *c = (http_client_t*)interceptor->owner;
+
+    c->process = interceptor->data_process;
+    c->total = http_response_get_length(&interceptor->response);
 
     if (0 == c->interest_event)
         RETURN_ERROR(HTTP_SUCCESS_ERROR);
@@ -47,7 +51,7 @@ void http_set_connect_status(http_client_t *c, http_connect_status_t state)
     platform_mutex_unlock(&c->global_lock);
 }
 
-int _http_client_internal_init(void)
+int _http_client_create(void)
 {
     http_client_t *c = NULL;
     int len = sizeof(http_client_t);
@@ -80,11 +84,13 @@ void *_http_client_pool_init(void)
 {
     int i;
 
+    platform_mutex_init(&_client_pool_lock);
+
     http_list_init(&_http_client_free_list);
     http_list_init(&_http_client_used_list);
 
     for (i = 0; i < HTTP_CLIENT_POOL_SIZE; i++) {
-        _http_client_internal_init();
+        _http_client_create();
     }
 }
 
@@ -94,7 +100,7 @@ int _http_client_handle(const char *url, void *data, http_request_method_t opt, 
 
     HTTP_ROBUSTNESS_CHECK(url, HTTP_NULL_VALUE_ERROR);
 
-    c = http_client_assign();
+    c = http_client_lease();
 
     HTTP_ROBUSTNESS_CHECK(c, HTTP_FAILED_ERROR);
 
@@ -120,14 +126,18 @@ int http_client_init(const char *ca)
 }
 
 
-http_client_t *http_client_assign(void)
+http_client_t *http_client_lease(void)
 {
     http_client_t *c = NULL;
     
     c = LIST_FIRST_ENTRY_OR_NULL(&_http_client_free_list, http_client_t, list);
     if (c != NULL) {
+        platform_mutex_lock(&_client_pool_lock);
+
         http_list_del(&c->list);
         http_list_add(&c->list, &_http_client_used_list);
+
+        platform_mutex_unlock(&_client_pool_lock);
     }
 
     return c;
@@ -137,12 +147,14 @@ void http_client_release(http_client_t *c)
 {
     HTTP_ROBUSTNESS_CHECK(c, HTTP_VOID);
 
+    platform_mutex_lock(&_client_pool_lock);
+
     http_list_del(&c->list);
     http_list_add(&c->list, &_http_client_free_list);
 
-    http_interceptor_release(c->interceptor);
-    
+    platform_mutex_unlock(&_client_pool_lock);
 
+    http_interceptor_release(c->interceptor);
 }
 
 void http_client_set_interest_event(http_client_t *c, http_event_type_t event)
