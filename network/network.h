@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:02
- * @LastEditTime: 2020-05-15 23:11:10
+ * @LastEditTime: 2020-05-20 19:42:47
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _NETWORK_H_
@@ -16,20 +16,18 @@
 typedef struct network {
     int                         socket;
     int                         channel;        /* tcp or tls */
-    const char                  *addr;
+    const char                  *host;
     const char                  *port;
-#ifndef HTTP_NETWORK_TYPE_NO_TLS
-    const char		            *ca_crt;
-    size_t 		                ca_crt_len;
+    const char                  *ca_crt;
+    size_t                      ca_crt_len;
     unsigned int                timeout_ms;            // SSL handshake timeout in millisecond
     void                        *nettype_tls_params;
-#endif
 } network_t;
 
-int network_init(network_t *n, const char *addr, const char *port, const char *ca);
+int network_init(network_t *n, const char *host, const char *port, const char *ca);
 int network_set_ca(network_t *n, const char *ca);
 int network_set_channel(network_t *n, int channel);
-int network_set_addr_port(network_t* n, char *addr, char *port);
+int network_set_host_port(network_t* n, char *host, char *port);
 int network_read(network_t* n, unsigned char* buf, int len, int timeout);
 int network_write(network_t* n, unsigned char* buf, int len, int timeout);
 int network_connect(network_t* n);

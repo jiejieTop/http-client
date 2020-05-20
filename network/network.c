@@ -2,16 +2,14 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:30:54
- * @LastEditTime: 2020-05-17 20:51:33
+ * @LastEditTime: 2020-05-20 19:48:01
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
+#include <routing.h>
 #include "platform_timer.h"
 #include "platform_memory.h"
 #include "platform_nettype_tcp.h"
-
-#ifndef HTTP_NETWORK_TYPE_NO_TLS
 #include "platform_nettype_tls.h"
-#endif
 
 int network_read(network_t *n, unsigned char *buf, int len, int timeout)
 {
@@ -47,21 +45,19 @@ void network_disconnect(network_t *n)
 
 }
 
-int network_init(network_t *n, const char *addr, const char *port, const char *ca)
+int network_init(network_t *n, const char *host, const char *port, const char *ca)
 {
     if (NULL == n)
         RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
 
     n->socket = -1;
-    n->addr = addr;
+    n->host = host;
     n->port = port;
     n->channel = 0;
 
-#ifndef HTTP_NETWORK_TYPE_NO_TLS
     if (NULL != ca) {
         network_set_ca(n, ca);
     }
-#endif
 
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
@@ -90,12 +86,12 @@ int network_set_ca(network_t *n, const char *ca)
     n->timeout_ms = HTTP_TLS_HANDSHAKE_TIMEOUT;
 }
 
-int network_set_addr_port(network_t* n, char *addr, char *port)
+int network_set_host_port(network_t* n, char *host, char *port)
 {
-    if (!(n && addr && port))
+    if (!(n && host && port))
         RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
 
-    n->addr = addr;
+    n->host = host;
     n->port = port;
 }
 

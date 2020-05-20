@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-01-11 19:45:35
- * @LastEditTime: 2020-05-15 23:07:16
+ * @LastEditTime: 2020-05-20 19:47:44
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_nettype_tls.h"
@@ -99,7 +99,7 @@ static int platform_nettype_tls_init(network_t* n, nettype_tls_params_t* nettype
         RETURN_ERROR(rc);
     }
     
-    mbedtls_ssl_conf_verify(&(nettype_tls_params->ssl_conf), server_certificate_verify, (void *)n->addr);
+    mbedtls_ssl_conf_verify(&(nettype_tls_params->ssl_conf), server_certificate_verify, (void *)n->host);
 
     mbedtls_ssl_conf_authmode(&(nettype_tls_params->ssl_conf), MBEDTLS_SSL_VERIFY_REQUIRED);
 #endif
@@ -112,7 +112,7 @@ static int platform_nettype_tls_init(network_t* n, nettype_tls_params_t* nettype
     }
 
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
-    if ((rc = mbedtls_ssl_set_hostname(&(nettype_tls_params->ssl), n->addr)) != 0) {
+    if ((rc = mbedtls_ssl_set_hostname(&(nettype_tls_params->ssl), n->host)) != 0) {
         HTTP_LOG_E("%s:%d %s()... mbedtls_ssl_set_hostname failed returned 0x%04x", __FILE__, __LINE__, __FUNCTION__, (rc < 0 )? -rc : rc);
         RETURN_ERROR(rc);
     }
@@ -140,7 +140,7 @@ int platform_nettype_tls_connect(network_t* n)
     if (HTTP_SUCCESS_ERROR != rc)
         goto exit;
 
-    if (0 != (rc = mbedtls_net_connect(&(nettype_tls_params->socket_fd), n->addr, n->port, MBEDTLS_NET_PROTO_TCP)))
+    if (0 != (rc = mbedtls_net_connect(&(nettype_tls_params->socket_fd), n->host, n->port, MBEDTLS_NET_PROTO_TCP)))
         goto exit;
 
     while ((rc = mbedtls_ssl_handshake(&(nettype_tls_params->ssl))) != 0) {

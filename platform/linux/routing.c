@@ -2,16 +2,22 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-15 16:24:37
- * @LastEditTime: 2020-05-16 15:56:57
+ * @LastEditTime: 2020-05-20 20:15:24
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <string.h>
 #include <routing.h>
 #include <platform_memory.h>
+#include <platform_mutex.h>
 
 #ifndef ROUTING_TABLE_SIZE
     #define ROUTING_TABLE_SIZE   10
 #endif // !ROUTING_TABLE_SIZE
+
+// #define ROUTING_STRICT_HANDLING
+#ifdef ROUTING_STRICT_HANDLING
+    static platform_mutex_t *_routing_mutex = NULL;
+#endif // !ROUTING_STRICT_HANDLING
 
 static uint8_t  _routing_index = 0;
 static routing_t _routing_table[ROUTING_TABLE_SIZE] = {0};
@@ -53,6 +59,15 @@ void routing_record(const char *host, const char *ip)
 {
     routing_t *routing;
 
+#ifdef ROUTING_STRICT_HANDLING
+    if (NULL == _routing_mutex) {
+        _routing_mutex = platform_memory_alloc(sizeof(platform_mutex_t));
+        if (NULL != _routing_mutex) {
+            platform_mutex_init(_routing_mutex);
+        }
+    }
+#endif
+
     int host_len = strlen(host) + 1;
     int ip_len = strlen(ip) + 1;
 
@@ -60,6 +75,26 @@ void routing_record(const char *host, const char *ip)
         _routing_index = 0;
 
     routing = &_routing_table[_routing_index];
+
+#ifdef ROUTING_STRICT_HANDLING
+    platform_mutex_lock(_routing_mutex);
+#endif
+
+    _routing_index ++;          /* I don't need mutex protection, fast ++ */
+
+#ifdef ROUTING_STRICT_HANDLING
+    platform_mutex_unlock(_routing_mutex);
+#endif
+
+    if (routing->host != NULL) {
+        platform_memory_free(routing->host);
+        routing->host = NULL;
+    }
+
+    if (routing->ip != NULL) {
+        platform_memory_free(routing->ip);
+        routing->ip = NULL;
+    }
 
     routing->host = platform_memory_alloc(host_len);
     routing->ip = platform_memory_alloc(host_len);
@@ -73,9 +108,18 @@ void routing_record(const char *host, const char *ip)
 
         routing->host[host_len] = '\0';
         routing->ip[ip_len] = '\0';
+    } else {
 
-        _routing_index ++;
+#ifdef ROUTING_STRICT_HANDLING
+    platform_mutex_lock(_routing_mutex);
+#endif
+        _routing_index --;      /* ailed, recover */
+        
+#ifdef ROUTING_STRICT_HANDLING
+    platform_mutex_unlock(_routing_mutex);
+#endif
     }
+
 }
 
 char *routing_search(const char* host)
