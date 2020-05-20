@@ -1,0 +1,25 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+    - name: remove trash
+      run: rm -rf build *.png *.exe
+    - name: linux install cmake
+      run: sudo apt-get install -y cmake
+    - name: build
+      run: ./build.sh
+    - name: runnig test
+      run: ./build/bin/http-client
+    - name: remove trash
+      run: rm -rf build *.png *.exe
