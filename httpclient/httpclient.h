@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-19 08:48:39
+ * @LastEditTime: 2020-05-20 20:28:45
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTPCLIENT_H_
@@ -42,6 +42,7 @@ typedef struct http_client {
 } http_client_t;
 
 int http_client_init(const char *ca);
+void http_client_exit(void);
 http_client_t *http_client_lease(void);
 void http_client_release(http_client_t *c);
 int http_client_get(const char *url, http_event_cb_t cb);

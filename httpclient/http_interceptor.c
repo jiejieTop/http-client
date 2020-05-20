@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-17 23:15:22
+ * @LastEditTime: 2020-05-20 21:13:23
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -283,8 +283,21 @@ int http_interceptor_init(http_interceptor_t *interceptor)
     if (http_interceptor_status_invalid != _http_interceptor_get_status(interceptor))
         RETURN_ERROR(HTTP_SUCCESS_ERROR);
 
-    interceptor->network = (network_t*) platform_memory_alloc(sizeof(network_t));
-    HTTP_ROBUSTNESS_CHECK(interceptor->network, HTTP_MEM_NOT_ENOUGH_ERROR);
+    if (NULL == interceptor->network)
+        interceptor->network = (network_t*) platform_memory_alloc(sizeof(network_t));
+
+    if (NULL == interceptor->evetn)
+        interceptor->evetn = http_event_init();
+        
+    HTTP_ROBUSTNESS_CHECK((interceptor->network && interceptor->evetn), HTTP_MEM_NOT_ENOUGH_ERROR);
+    
+    if (NULL == interceptor->message)
+        interceptor->message = http_message_buffer_init(0);
+
+    if (NULL == interceptor->buffer)
+        interceptor->buffer = platform_memory_alloc(interceptor->buffer_len);
+
+    HTTP_ROBUSTNESS_CHECK((interceptor->message && interceptor->buffer), HTTP_MEM_NOT_ENOUGH_ERROR);
 
     http_request_init(&interceptor->request);
     http_response_init(&interceptor->response);
@@ -295,17 +308,6 @@ int http_interceptor_init(http_interceptor_t *interceptor)
     interceptor->flag.all_flag = 0;
     interceptor->owner = NULL;
     
-    if (NULL == interceptor->evetn)
-        interceptor->evetn = http_event_init();
-    
-    if (NULL == interceptor->message)
-        interceptor->message = http_message_buffer_init(0);
-
-    if (NULL == interceptor->buffer)
-        interceptor->buffer = platform_memory_alloc(interceptor->buffer_len);
-
-    HTTP_ROBUSTNESS_CHECK((interceptor->message && interceptor->buffer), HTTP_MEM_NOT_ENOUGH_ERROR);
-
     res = _http_interceptor_prepare(interceptor);
     if (HTTP_SUCCESS_ERROR != res)
         RETURN_ERROR(res);
@@ -527,6 +529,11 @@ int http_interceptor_release(http_interceptor_t *interceptor)
     if (interceptor->evetn) {
         http_event_release(interceptor->evetn);
         interceptor->evetn = NULL;
+    }
+
+    if (interceptor->buffer) {
+        platform_memory_free(interceptor->buffer);
+        interceptor->buffer = NULL;
     }
 
     http_request_release(&interceptor->request);

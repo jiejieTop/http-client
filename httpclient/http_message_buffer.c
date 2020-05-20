@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:21:58
- * @LastEditTime: 2020-05-13 16:03:37
+ * @LastEditTime: 2020-05-20 20:20:08
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -29,7 +29,7 @@ http_message_buffer_t *http_message_buffer_init(size_t size)
     if (0 == size)
         size = HTTP_MESSAGE_BUFFER_GROWTH;
 
-    buf = (http_message_buffer_t *)platform_memory_alloc(sizeof(*buf));
+    buf = (http_message_buffer_t *)platform_memory_alloc(sizeof(http_message_buffer_t));
     
     buf->data = platform_memory_alloc(size);
     buf->data[0] = '\0';
@@ -45,7 +45,8 @@ int http_message_buffer_reinit(http_message_buffer_t *buf)
 
     if (0 == buf->length) {
         buf->length = HTTP_MESSAGE_BUFFER_GROWTH;
-        buf = platform_memory_alloc(HTTP_MESSAGE_BUFFER_GROWTH);
+        buf->data = platform_memory_alloc(HTTP_MESSAGE_BUFFER_GROWTH);
+        HTTP_ROBUSTNESS_CHECK((buf->data), HTTP_MEM_NOT_ENOUGH_ERROR);
     }
     
     memset(buf->data, 0, buf->length);

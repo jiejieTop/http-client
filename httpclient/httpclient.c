@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-19 20:44:34
+ * @LastEditTime: 2020-05-20 21:02:19
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -58,7 +58,7 @@ int _http_client_create(void)
     
     c = platform_memory_alloc(len);
     
-    memset(c, 0, sizeof(http_client_t));
+    memset(c, 0, len);
 
     http_list_init(&c->list);
 
@@ -73,8 +73,9 @@ int _http_client_create(void)
     }
 
     if (NULL == c->interceptor) {
-        c->interceptor = platform_memory_alloc(sizeof(http_interceptor_t));
-        memset(c->interceptor, 0, sizeof(http_interceptor_t));
+        len = sizeof(http_interceptor_t);
+        c->interceptor = platform_memory_alloc(len);
+        memset(c->interceptor, 0, len);
     }
 
     platform_mutex_init(&c->global_lock);
@@ -92,6 +93,29 @@ void *_http_client_pool_init(void)
     for (i = 0; i < HTTP_CLIENT_POOL_SIZE; i++) {
         _http_client_create();
     }
+}
+
+void _http_client_destroy(http_client_t *c)
+{
+    HTTP_ROBUSTNESS_CHECK(c, HTTP_VOID);
+
+    if (NULL == c->connect_params) {
+        http_release_connect_params(c->connect_params);
+        c->connect_params = NULL;
+    }
+
+    if (NULL == c->event) {
+        http_event_release(c->event);
+        c->event = NULL;
+    }
+
+
+    if (c->interceptor) {
+        platform_memory_free(c->interceptor);
+        c->interceptor = NULL;
+    }
+
+    http_list_del(&c->list);
 }
 
 int _http_client_handle(const char *url, void *data, http_request_method_t opt, http_event_cb_t cb)
@@ -125,12 +149,35 @@ int http_client_init(const char *ca)
     http_interceptor_set_ca(ca);
 }
 
+void http_client_exit(void)
+{
+    http_client_t *c = NULL;
+    
+    do {
+        c = HTTP_LIST_FIRST_ENTRY_OR_NULL(&_http_client_free_list, http_client_t, list);
+        if (NULL == c)
+            break;
+
+        _http_client_destroy(c);
+        platform_memory_free(c);
+    } while (c != NULL);
+
+    do {
+        c = HTTP_LIST_FIRST_ENTRY_OR_NULL(&_http_client_used_list, http_client_t, list);
+        if (NULL == c)
+            break;
+
+        _http_client_destroy(c);
+        platform_memory_free(c);
+    } while (c != NULL);
+}
+
 
 http_client_t *http_client_lease(void)
 {
     http_client_t *c = NULL;
     
-    c = LIST_FIRST_ENTRY_OR_NULL(&_http_client_free_list, http_client_t, list);
+    c = HTTP_LIST_FIRST_ENTRY_OR_NULL(&_http_client_free_list, http_client_t, list);
     if (c != NULL) {
         platform_mutex_lock(&_client_pool_lock);
 
