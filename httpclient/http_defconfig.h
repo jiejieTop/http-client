@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-02-25 03:36:09
- * @LastEditTime: 2020-05-15 21:57:11
+ * @LastEditTime: 2020-05-21 20:57:14
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -47,7 +47,9 @@
     #define     HTTP_THREAD_TICK                    50
 #endif // !HTTP_THREAD_TICK
 
-
+#ifndef HTTP_CLIENT_POOL_SIZE
+    #define HTTP_CLIENT_POOL_SIZE                   5
+#endif // !HTTP_CLIENT_POOL_SIZE
 
 #define HTTP_MESSAGE_BUFFER_GROWTH  64
 

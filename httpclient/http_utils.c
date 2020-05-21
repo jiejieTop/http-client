@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-03 13:35:08
- * @LastEditTime: 2020-05-15 15:06:38
+ * @LastEditTime: 2020-05-21 21:33:35
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -110,6 +110,20 @@ int http_utils_ignore_case_nmatch(const char *str1, const char *str2, int n)
     return c1 - c2;
 }
 
+char *http_utils_right_strchr(char * s, char x)
+{
+    int i = strlen(s);
+    if (!(*s)) 
+        return 0;
+    while (s[i-1]) {
+        if (strchr(s + (i - 1), x)) {
+            return (s + (i - 1));
+        } else {
+            i--;
+        }
+    }
+    return 0;
+}
 
 char *http_utils_assign_string(char **str, const char *new_str, int len)
 {
