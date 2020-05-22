@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-01-10 23:45:59
- * @LastEditTime: 2020-05-16 16:12:42
+ * @LastEditTime: 2020-05-22 20:47:36
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <routing.h>
@@ -10,13 +10,16 @@
 
 int platform_net_socket_connect(const char *host, const char *port, int proto)
 {
+    int need_record = 0;
     int fd, ret = HTTP_SOCKET_UNKNOWN_HOST_ERROR;
     struct addrinfo hints, *addr_list, *cur;
     char ip[16] = {0};
     const char *host_ip = NULL;
 
-    if ((host_ip = routing_search(host)) == NULL)
+    if ((host_ip = routing_search(host)) == NULL) {
+        need_record = 1;
         host_ip = host;
+    }
 
     /* Do name resolution with both IPv6 and IPv4 */
     memset(&hints, 0, sizeof(hints));
@@ -37,9 +40,9 @@ int platform_net_socket_connect(const char *host, const char *port, int proto)
 
         if (connect(fd, cur->ai_addr, cur->ai_addrlen) == 0) {
             ret = fd;
-
-            inet_ntop(cur->ai_family, &(((struct sockaddr_in *)(cur->ai_addr))->sin_addr), ip, 16);
-            if (NULL != ip) {
+            
+            if (need_record == 1) {
+                inet_ntop(cur->ai_family, &(((struct sockaddr_in *)(cur->ai_addr))->sin_addr), ip, 16);
                 routing_record(host, ip);
             }
 

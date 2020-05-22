@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-20 21:02:19
+ * @LastEditTime: 2020-05-22 23:08:07
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -15,6 +15,8 @@
 #ifndef HTTP_CLIENT_POOL_SIZE
     #define HTTP_CLIENT_POOL_SIZE   5
 #endif // !HTTP_CLIENT_POOL_SIZE
+
+// #define HTTP_USING_WORK_QUEUE
 
 static http_list_t _http_client_free_list;
 static http_list_t _http_client_used_list;
@@ -38,6 +40,18 @@ static int _http_client_internal_event_handle(void *e)
     return 0;
 }
 
+static void _http_client_wq_handle(void *client)
+{
+    http_client_t *c = (http_client_t*)client;
+
+    http_interceptor_process(c->interceptor, 
+                             c->connect_params, 
+                             c->method, 
+                             c->data, 
+                             c,
+                             _http_client_internal_event_handle);
+    http_client_release(c);
+}
 
 http_connect_status_t http_get_connect_status(http_client_t *c)
 {
@@ -118,7 +132,7 @@ void _http_client_destroy(http_client_t *c)
     http_list_del(&c->list);
 }
 
-int _http_client_handle(const char *url, void *data, http_request_method_t opt, http_event_cb_t cb)
+int _http_client_handle(const char *url, void *data, http_request_method_t method, http_event_cb_t cb)
 {
     http_client_t *c = NULL;
 
@@ -127,20 +141,23 @@ int _http_client_handle(const char *url, void *data, http_request_method_t opt, 
     c = http_client_lease();
 
     HTTP_ROBUSTNESS_CHECK(c, HTTP_FAILED_ERROR);
-
     http_client_set_interest_event(c, http_event_type_on_body);
-
+    http_client_set_method(c, method);
+    http_client_set_data(c, data);
     http_event_register(c->event, cb);
-
     http_url_parsing(c->connect_params, url);
 
+#ifdef HTTP_USING_WORK_QUEUE
+    _http_client_wq_handle(c);
+#else
     http_interceptor_process(c->interceptor, 
                              c->connect_params, 
-                             opt, 
-                             data, 
+                             c->method, 
+                             c->data, 
                              c,
                              _http_client_internal_event_handle);
     http_client_release(c);
+#endif // HTTP_USING_WORK_QUEUE 
 }
 
 int http_client_init(const char *ca)
@@ -209,6 +226,18 @@ void http_client_set_interest_event(http_client_t *c, http_event_type_t event)
     HTTP_ROBUSTNESS_CHECK((c && event), HTTP_VOID);
 
     c->interest_event = event;
+}
+
+void http_client_set_method(http_client_t *c, http_request_method_t method)
+{
+    HTTP_ROBUSTNESS_CHECK((c && method), HTTP_VOID);
+    c->method = method;
+}
+
+void http_client_set_data(http_client_t *c, void *data)
+{
+    HTTP_ROBUSTNESS_CHECK(c, HTTP_VOID);
+    c->data = data;
 }
 
 int http_client_get(const char *url, http_event_cb_t cb)

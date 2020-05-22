@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-20 20:28:45
+ * @LastEditTime: 2020-05-22 22:15:00
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTPCLIENT_H_
@@ -35,10 +35,12 @@ typedef struct http_client {
     platform_mutex_t                    global_lock;
     http_interceptor_t                  *interceptor;
     http_connect_params_t               *connect_params;
+    http_request_method_t               method;
     uint32_t                            interest_event;
     http_event_t                        *event;
     size_t                              process;
     size_t                              total;
+    void                                *data;
 } http_client_t;
 
 int http_client_init(const char *ca);
@@ -48,5 +50,8 @@ void http_client_release(http_client_t *c);
 int http_client_get(const char *url, http_event_cb_t cb);
 int http_client_post(const char *url, void *data ,http_event_cb_t cb);
 void http_client_set_interest_event(http_client_t *c, http_event_type_t event);
+
+void http_client_set_method(http_client_t *c, http_request_method_t method);
+void http_client_set_data(http_client_t *c, void *data);
 
 #endif /* _HTTPCLIENT_H_ */
