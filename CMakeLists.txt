@@ -4,14 +4,15 @@ project(http-client)
 
 set(TARGETS "http-client")
 set(SUBDIRS "test" "platform" "network" "common" "libhttp" "httpclient")
-set(INCDIRS  "test" "platform/linux" "common" "common/log" "common/mbedtls/include" "network" "libhttp" "httpclient")
+set(INCDIRS  "test" "platform/linux" "common" "common/log" "network/mbedtls/include" "network" "libhttp" "httpclient")
 set(OUTDIRS "build")
 set(LIBNAMES "platform" "network" "common" "salof" "mbedtls" "libhttp" "httpclient")
 set(PROJECT_ROOT_PATH "${PROJECT_SOURCE_DIR}")
 set(LIBRARY_OUTPUT_PATH "${PROJECT_ROOT_PATH}/${OUTDIRS}/lib/")
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_ROOT_PATH}/${OUTDIRS}/bin/")
 
-SET(CMAKE_BUILD_TYPE "Debug")   # Debug Release
+set(CMAKE_BUILD_TYPE "Debug")   # Debug Release
+set(CMAKE_LIB_TYPE "SHARED")   # SHARED STATIC
 
 set(CMAKE_C_COMPILER "gcc")
 set(CMAKE_CXX_COMPILER "g++" )
