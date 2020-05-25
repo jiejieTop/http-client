@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-15 16:24:37
- * @LastEditTime: 2020-05-20 20:15:24
+ * @LastEditTime: 2020-05-25 21:04:55
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <string.h>
@@ -43,14 +43,15 @@ static uint32_t _routing_hash(const char* str)
     return hash;
 }
 
-static int _routing_match(const char *str, const char *cmd)
+static int _routing_match(const char *str1, const char *str2, int n)
 {
+    int i = 0;
     int c1, c2;
-
     do {
-        c1 = _routing_to_lower(*str++);
-        c2 = _routing_to_lower(*cmd++);
-    } while((c1 == c2) && c1);
+        c1 = *str1++;
+        c2 = *str2++;
+        i++;
+    } while(((c1 == c2) && c1) && (i < n));
 
     return c1 - c2;
 }
@@ -68,8 +69,8 @@ void routing_record(const char *host, const char *ip)
     }
 #endif
 
-    int host_len = strlen(host) + 1;
-    int ip_len = strlen(ip) + 1;
+    int host_len = strlen(host);
+    int ip_len = strlen(ip);
 
     if (_routing_index >= ROUTING_TABLE_SIZE - 1)
         _routing_index = 0;
@@ -97,7 +98,7 @@ void routing_record(const char *host, const char *ip)
     }
 
     routing->host = platform_memory_alloc(host_len);
-    routing->ip = platform_memory_alloc(host_len);
+    routing->ip = platform_memory_alloc(ip_len);
 
     if ((NULL != routing->host) && (NULL != routing->ip)) {
         
@@ -108,6 +109,7 @@ void routing_record(const char *host, const char *ip)
 
         routing->host[host_len] = '\0';
         routing->ip[ip_len] = '\0';
+
     } else {
 
 #ifdef ROUTING_STRICT_HANDLING
@@ -126,14 +128,15 @@ char *routing_search(const char* host)
 {
     uint8_t index = 0;
     routing_t *routing;
+    int len = sizeof(host);
     uint32_t hash = _routing_hash(host);
 
     for (index = 0; index < ROUTING_TABLE_SIZE; index ++) {
 
         routing = &_routing_table[index];
-
+        
         if (hash == routing->hash) {
-            if (_routing_match(host, routing->host) == 0) {
+            if (_routing_match(host, routing->host, len) == 0) {
                 return routing->ip;
             }
         }
