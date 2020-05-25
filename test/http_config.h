@@ -2,13 +2,13 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 00:42:16
- * @LastEditTime: 2020-05-16 21:43:05
+ * @LastEditTime: 2020-05-25 23:37:49
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_CONFIG_H_
 #define _HTTP_CONFIG_H_
 
-#define             LOG_IS_SALOF
+// #define             LOG_IS_SALOF
 
 #define             LOG_LEVEL                   INFO_LEVEL   //WARN_LEVEL DEBUG_LEVEL INFO_LEVEL
 
@@ -38,8 +38,10 @@
 #define     HTTP_THREAD_STACK_SIZE              2048
 #define     HTTP_THREAD_PRIO                    10
 #define     HTTP_THREAD_TICK                    50
+#define     HTTP_CLIENT_POOL_SIZE               15
 
-// #define     HTTP_NETWORK_TYPE_NO_TLS
+// #define     HTTP_USING_WORK_QUEUE            HTTP_YES
+// #define     HTTP_NETWORK_TYPE_NO_TLS         HTTP_YES
 
 #endif /* _HTTP_CONFIG_H_ */
 

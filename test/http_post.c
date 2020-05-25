@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-16 22:22:53
- * @LastEditTime: 2020-05-17 13:29:00
+ * @LastEditTime: 2020-05-25 23:37:07
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 
@@ -27,8 +27,6 @@ static int _http_cb(void *e)
 void http_post_test(void)
 {
     printf("\n---------------------- http_post_test start ----------------------\n");
-
-    http_client_init(ca_get());
     
     printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
     http_client_post(URL1, "this is a post test ...", _http_cb);

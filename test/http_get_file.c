@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-16 22:23:05
- * @LastEditTime: 2020-05-18 17:03:05
+ * @LastEditTime: 2020-05-25 23:37:20
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <stdio.h>
@@ -25,9 +25,9 @@ static char *pbuf1 = NULL;
 static char *pbuf2 = NULL;
 static char *pbuf3 = NULL;
 
-static uint64_t pbuf1_len = 0;
-static uint64_t pbuf2_len = 0;
-static uint64_t pbuf3_len = 0;
+static size_t pbuf1_len = 0;
+static size_t pbuf2_len = 0;
+static size_t pbuf3_len = 0;
 
 static void printf_progress_bar(size_t process, size_t total)
 {
@@ -48,15 +48,16 @@ static int _http_cb1(void *e)
 {
     static size_t process_len = 0;
     http_event_t *event = e;
-    http_client_t *client = event->context;
-    http_interceptor_t *interceptor = client->interceptor;
-
-    pbuf1_len = http_response_get_length(&interceptor->response);
 
     if (event->len <= 0)
         return -1;
 
     if (NULL == pbuf1) {
+        http_client_t *client = event->context;
+        http_interceptor_t *interceptor = client->interceptor;
+
+        pbuf1_len = http_response_get_length(&interceptor->response);
+        
         printf("\nfile size : %ld KB\n", pbuf1_len);
         pbuf1 = platform_memory_alloc(pbuf1_len);
     }
@@ -74,15 +75,17 @@ static int _http_cb2(void *e)
 {
     static size_t process_len = 0;
     http_event_t *event = e;
-    http_client_t *client = event->context;
-    http_interceptor_t *interceptor = client->interceptor;
 
-    pbuf2_len = http_response_get_length(&interceptor->response);
 
     if (event->len <= 0)
         return -1;
 
     if (NULL == pbuf2) {
+        http_client_t *client = event->context;
+        http_interceptor_t *interceptor = client->interceptor;
+
+        pbuf2_len = http_response_get_length(&interceptor->response);
+
         printf("\nfile size : %ld KB\n", pbuf2_len);
         pbuf2 = platform_memory_alloc(pbuf2_len);
     }
@@ -100,15 +103,16 @@ static int _http_cb3(void *e)
 {
     static size_t process_len = 0;
     http_event_t *event = e;
-    http_client_t *client = event->context;
-    http_interceptor_t *interceptor = client->interceptor;
-
-    pbuf3_len = http_response_get_length(&interceptor->response);
 
     if (event->len <= 0)
         return -1;
 
     if (NULL == pbuf3) {
+        http_client_t *client = event->context;
+        http_interceptor_t *interceptor = client->interceptor;
+        
+        pbuf3_len = http_response_get_length(&interceptor->response);
+
         printf("\nfile size : %ld KB\n", pbuf3_len);
         pbuf3 = platform_memory_alloc(pbuf3_len);
     }
@@ -127,9 +131,6 @@ void http_get_file_test(void)
     FILE *fp =NULL;
 
     printf("\n---------------------- http_get_file_test start ----------------------\n");
-
-    http_client_init(ca_get());
-
 
     http_client_get(URL1, _http_cb1);
     if (pbuf1_len) {

@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-16 22:40:21
- * @LastEditTime: 2020-05-17 13:29:53
+ * @LastEditTime: 2020-05-25 22:43:00
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 
@@ -30,8 +30,6 @@ static int _http_cb(void *e)
 void http_redirect_test(void)
 {
     printf("\n---------------------- http_redirect_test start ----------------------\n");
-
-    http_client_init(ca_get());
     
     printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
     http_client_get(URL1, _http_cb);
