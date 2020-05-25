@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 19:36:42
- * @LastEditTime: 2020-05-12 11:32:45
+ * @LastEditTime: 2020-05-25 21:08:38
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -59,7 +59,7 @@ typedef enum http_response_status {
 
 
 typedef struct http_response {
-    uint64_t                        length;         /* content length */
+    size_t                          length;         /* content length */
     uint32_t                        offset;         /* data offset, skip header */
     http_response_status_t          status;         /* response status code */
     http_message_buffer_t           *message;
@@ -68,8 +68,8 @@ typedef struct http_response {
 int http_response_init(http_response_t *rsp);
 int http_response_release(http_response_t *rsp);
 
-uint64_t http_response_get_length(http_response_t *rsp);
-void http_response_set_length(http_response_t *rsp, uint64_t length);
+size_t http_response_get_length(http_response_t *rsp);
+void http_response_set_length(http_response_t *rsp, size_t length);
 
 uint32_t http_response_get_offset(http_response_t *rsp);
 void http_response_set_offset(http_response_t *rsp, uint32_t offset);

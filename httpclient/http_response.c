@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 19:36:36
- * @LastEditTime: 2020-05-12 11:32:37
+ * @LastEditTime: 2020-05-25 21:08:29
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -32,13 +32,13 @@ int http_response_release(http_response_t *rsp)
 }
 
 
-uint64_t http_response_get_length(http_response_t *rsp)
+size_t http_response_get_length(http_response_t *rsp)
 {
     HTTP_ROBUSTNESS_CHECK(rsp , 0);
     return rsp->length;
 }
 
-void http_response_set_length(http_response_t *rsp, uint64_t length)
+void http_response_set_length(http_response_t *rsp, size_t length)
 {
     HTTP_ROBUSTNESS_CHECK(rsp, HTTP_VOID);
     rsp->length = length;

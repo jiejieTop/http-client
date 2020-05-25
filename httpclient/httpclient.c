@@ -2,12 +2,13 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-22 23:08:07
+ * @LastEditTime: 2020-05-25 23:38:34
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
 #include <http_log.h>
 #include <http_error.h>
+#include <http_wq.h>
 #include <http_list.h>
 #include <http_event.h>
 #include <platform_memory.h>
@@ -15,8 +16,6 @@
 #ifndef HTTP_CLIENT_POOL_SIZE
     #define HTTP_CLIENT_POOL_SIZE   5
 #endif // !HTTP_CLIENT_POOL_SIZE
-
-// #define HTTP_USING_WORK_QUEUE
 
 static http_list_t _http_client_free_list;
 static http_list_t _http_client_used_list;
@@ -148,15 +147,16 @@ int _http_client_handle(const char *url, void *data, http_request_method_t metho
     http_url_parsing(c->connect_params, url);
 
 #ifdef HTTP_USING_WORK_QUEUE
-    _http_client_wq_handle(c);
+    return http_wq_add_task(_http_client_wq_handle, c, sizeof(c));
 #else
-    http_interceptor_process(c->interceptor, 
-                             c->connect_params, 
-                             c->method, 
-                             c->data, 
-                             c,
-                             _http_client_internal_event_handle);
+    int res = http_interceptor_process( c->interceptor, 
+                                        c->connect_params, 
+                                        c->method, 
+                                        c->data, 
+                                        c,
+                                        _http_client_internal_event_handle);
     http_client_release(c);
+    return res;
 #endif // HTTP_USING_WORK_QUEUE 
 }
 
@@ -164,12 +164,21 @@ int http_client_init(const char *ca)
 {
     _http_client_pool_init();
     http_interceptor_set_ca(ca);
+
+#ifdef HTTP_USING_WORK_QUEUE
+    http_wq_pool_init();
+#endif
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 void http_client_exit(void)
 {
     http_client_t *c = NULL;
     
+#ifdef HTTP_USING_WORK_QUEUE
+    http_wq_pool_deinit();
+#endif
+
     do {
         c = HTTP_LIST_FIRST_ENTRY_OR_NULL(&_http_client_free_list, http_client_t, list);
         if (NULL == c)
@@ -187,6 +196,7 @@ void http_client_exit(void)
         _http_client_destroy(c);
         platform_memory_free(c);
     } while (c != NULL);
+    
 }
 
 
