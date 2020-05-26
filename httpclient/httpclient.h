@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-26 19:25:07
+ * @LastEditTime: 2020-05-26 20:36:20
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTPCLIENT_H_
@@ -30,7 +30,6 @@
 
 typedef struct http_client {
     http_list_t                         list;
-    platform_mutex_t                    global_lock;
     http_interceptor_t                  *interceptor;
     http_connect_params_t               *connect_params;
     http_request_method_t               method;
@@ -42,6 +41,7 @@ typedef struct http_client {
 } http_client_t;
 
 int http_client_init(const char *ca);
+void http_client_wait_exit(void);
 void http_client_exit(void);
 http_client_t *http_client_lease(void);
 void http_client_release(http_client_t *c);

@@ -58,7 +58,7 @@ static int _http_write_buffer(http_interceptor_t *interceptor, unsigned char *bu
         RETURN_ERROR(HTTP_SUCCESS_ERROR);
     }
     
-    RETURN_ERROR(HTTP_SEND_PACKET_ERROR);
+    RETURN_ERROR(HTTP_SEND_MESSAGE_ERROR);
 }
 
 static void _http_interceptor_set_status(http_interceptor_t *interceptor, http_interceptor_status_t status)

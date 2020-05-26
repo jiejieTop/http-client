@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-26 19:25:22
+ * @LastEditTime: 2020-05-26 21:15:46
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -12,10 +12,6 @@
 #include <http_list.h>
 #include <http_event.h>
 #include <platform_memory.h>
-
-#ifndef HTTP_CLIENT_POOL_SIZE
-    #define HTTP_CLIENT_POOL_SIZE   5
-#endif // !HTTP_CLIENT_POOL_SIZE
 
 static http_list_t _http_client_free_list;
 static http_list_t _http_client_used_list;
@@ -78,8 +74,6 @@ int _http_client_create(void)
         c->interceptor = platform_memory_alloc(len);
         memset(c->interceptor, 0, len);
     }
-
-    platform_mutex_init(&c->global_lock);
 }
 
 void *_http_client_pool_init(void)
@@ -109,7 +103,6 @@ void _http_client_destroy(http_client_t *c)
         http_event_release(c->event);
         c->event = NULL;
     }
-
 
     if (c->interceptor) {
         platform_memory_free(c->interceptor);

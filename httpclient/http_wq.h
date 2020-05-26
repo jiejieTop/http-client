@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-21 20:59:36
- * @LastEditTime: 2020-05-26 14:38:43
+ * @LastEditTime: 2020-05-26 21:06:40
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 
@@ -38,7 +38,6 @@ typedef struct worker {
 int http_wq_pool_init(void);
 void http_wq_pool_deinit(void);
 void http_wq_wait_exit(void);
-void http_wq_wait_complete(void);
 int http_wq_add_task(http_worker_func_t func, void *data, size_t len);
 
 

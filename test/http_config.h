@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 00:42:16
- * @LastEditTime: 2020-05-26 19:41:15
+ * @LastEditTime: 2020-05-26 21:17:29
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_CONFIG_H_
@@ -37,6 +37,7 @@
 #define     HTTP_THREAD_PRIO                    10
 #define     HTTP_THREAD_TICK                    50
 #define     HTTP_CLIENT_POOL_SIZE               15
+#define     HTTP_CLIENT_WORK_QUEUE_SIZE         1
 
 // #define     HTTP_USING_WORK_QUEUE            HTTP_YES
 // #define     HTTP_NETWORK_TYPE_NO_TLS         HTTP_YES

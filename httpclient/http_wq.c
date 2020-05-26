@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-21 20:59:27
- * @LastEditTime: 2020-05-26 17:17:18
+ * @LastEditTime: 2020-05-26 21:17:16
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <http_wq.h>
@@ -140,7 +140,7 @@ int http_wq_pool_init(void)
     #include <sys/sysinfo.h>
     int cpus = get_nprocs_conf();
 #else
-    int cpus = 1;
+    int cpus = HTTP_CLIENT_WORK_QUEUE_SIZE;
 #endif // __linux__
 
     if (cpus <= 0) {

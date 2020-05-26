@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-02-25 03:36:09
- * @LastEditTime: 2020-05-26 19:41:26
+ * @LastEditTime: 2020-05-26 21:17:00
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -41,6 +41,10 @@
 
 #ifndef HTTP_CLIENT_POOL_SIZE
     #define HTTP_CLIENT_POOL_SIZE                   10
+#endif // !HTTP_CLIENT_POOL_SIZE
+
+#ifndef HTTP_CLIENT_WORK_QUEUE_SIZE
+    #define HTTP_CLIENT_WORK_QUEUE_SIZE             1
 #endif // !HTTP_CLIENT_POOL_SIZE
 
 #define HTTP_MESSAGE_BUFFER_GROWTH  64
