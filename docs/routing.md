@@ -26,7 +26,7 @@ static routing_t _routing_table[ROUTING_TABLE_SIZE] = {0};
 
 ```
 
-维护一个路由表，保存了host与ip的关系，路由表的默认大小是**ROUTING_TABLE_SIZE**，值为10，可由用户修改，路由表的核心就是数组，在实际处理过程中会循环记录，当路由表不足的时候，会选择先缓存的表覆盖掉。
+维护一个路由表，保存了**host**与**ip**的关系，路由表的默认大小是**ROUTING_TABLE_SIZE**，值为**10**，可由用户修改，路由表的核心就是数组，在实际处理过程中会循环记录，当路由表不足的时候，会选择先缓存的表覆盖掉。
 
 
 ## 外部函数
@@ -59,7 +59,7 @@ static uint32_t _routing_hash(const char* str)
 static int _routing_match(const char *str, const char *cmd)
 ```
 
-**上一篇**： [平台抽象层—tls加密传输](./platform_nettype_tls.md)
+**上一篇**： [tls加密传输](./nettype_tls.md)
 
 **下一篇**： [network网卡](./network.md)
 

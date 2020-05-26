@@ -3,7 +3,7 @@
 
 ## 数据结构
 
-基本的报文描述，可以描述多种报文数据结构，如请求报文的**起始行**、**报文头部**、**报文主体**等，`length`表示该报文被分配的内存空间，`used`表示已使用的内存空间，`data`是内存区域。
+基本的报文描述，可以描述多种报文数据结构，如请求报文的**起始行**、**报文头部**、**报文主体**等，**length**表示该报文被分配的内存空间，**used**表示已使用的内存空间，**data**是内存区域。
 
 ```c
 typedef struct http_message_buffer {
@@ -15,7 +15,7 @@ typedef struct http_message_buffer {
 
 ## 外部函数
 
-- 初始化报文并分配指定大小size的内存空间，如果不指定（size为0）则分配默认的内存空间`HTTP_MESSAGE_BUFFER_GROWTH`，该宏在`http_defconfig.h`被定义，可由用户修改。
+- 初始化报文并分配指定大小size的内存空间，如果不指定（**size为0**）则分配默认的内存空间**HTTP_MESSAGE_BUFFER_GROWTH**，该宏在`http_defconfig.h`被定义，可由用户修改。
 
 ```c
 http_message_buffer_t *http_message_buffer_init(size_t size)
@@ -34,19 +34,19 @@ void http_message_buffer_release(http_message_buffer_t *buf)
 ```
 
 
-- 将字符串连接到报文中，可变参数，字符串必须以`NULL`结束，自动处理内存不足的问题，增长的内存大小是`HTTP_MESSAGE_BUFFER_GROWTH`的倍数。
+- 将字符串连接到报文中，可变参数，字符串必须以**NULL**结束，自动处理内存不足的问题，增长的内存大小是**HTTP_MESSAGE_BUFFER_GROWTH**的倍数。
 
 ```c
 void http_message_buffer_concat(http_message_buffer_t *buf, ...)
 ```
 
-- 通过**覆盖写入**的方式将数据写入到报文中，参数可变，字符串必须以`NULL`结束，会自动处理内存不足的问题。
+- 通过**覆盖写入**的方式将数据写入到报文中，参数可变，字符串必须以**NULL**结束，会自动处理内存不足的问题。
 
 ```c
 void http_message_buffer_cover(http_message_buffer_t *buf, ...)
 ```
 
-- 追加指定的`str`字符串数据到报文中，`len`是追加的字符串长度，可自动处理内存不足的问题。
+- 追加指定的**str**字符串数据到报文中，**len**是追加的字符串长度，可自动处理内存不足的问题。
 
 ```c
 void http_message_buffer_append(http_message_buffer_t *buf, const char *str, size_t len
@@ -59,7 +59,7 @@ int http_message_buffer_pointer(http_message_buffer_t *buf, const char *str, siz
 ```
 
 
-- 给buf增长内存空间，增长的内存大小是`HTTP_MESSAGE_BUFFER_GROWTH`的倍数。当buf的剩余空间不足以存放指定`newsize`大小的数据时，自动分配内存。
+- 给buf增长内存空间，增长的内存大小是**HTTP_MESSAGE_BUFFER_GROWTH**的倍数。当buf的剩余空间不足以存放指定**newsize**大小的数据时，自动分配内存。
 
 ```c
 void http_message_buffer_grow(http_message_buffer_t *buf, size_t newsize)

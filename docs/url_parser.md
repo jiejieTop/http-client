@@ -8,7 +8,7 @@
 
 ## 数据结构
 
-url的各个字段内容：
+**url**的各个字段内容：
 
 ```c
 typedef struct http_connect_params {
@@ -27,7 +27,7 @@ typedef struct http_connect_params {
 
 ## 外部函数
 
-- 解析`url`的各个字段内容并且保存在`http_connect_params_t`结构中。
+- 解析**url**的各个字段内容并且保存在**http_connect_params_t**结构中。
 
 ```c
 int http_url_parsing(http_connect_params_t *connect_params, const char *url)

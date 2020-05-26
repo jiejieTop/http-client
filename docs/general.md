@@ -2,7 +2,7 @@
 
 ## 数据结构
 
-- 连接参数信息，它实际上是url的各个字段内容，它在url解析器中被使用，解析url产生相关信息保存在这里。
+- 连接参数信息，它实际上是**url**的各个字段内容，它在**url**解析器中被使用，解析**url**产生相关信息保存在这里。
 
 ```c
 typedef struct http_connect_params {
@@ -21,14 +21,14 @@ typedef struct http_connect_params {
 
 ## 相关的宏定义
 
-- 常用的http、https协议端口
+- 常用的**http、https**协议端口
 
 ```c
 #define DEFAULT_HTTP_PORT   "80"
 #define DEFAULT_HTTPS_PORT  "443"
 ```
 
-- 让编译器预处理，产一系列功能操作相同的函数，**获取/设置**连接参数的相关信息，如url、scheme、host、user、password、path、query等。
+- 让编译器预处理，产一系列功能操作相同的函数，**获取/设置**连接参数的相关信息，如**url、scheme、host、user、password、path、query**等。
 
 ```c
 #define HTTP_GET_CONNECT_PARAMS_DEFINE(name, type, res)                                     \

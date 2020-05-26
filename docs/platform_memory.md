@@ -8,7 +8,7 @@
 
 ## 外部函数
 
-- 动态分配`size`大小的内存。
+- 动态分配**size**大小的内存。
 
 ```c
 void *platform_memory_alloc(size_t size)

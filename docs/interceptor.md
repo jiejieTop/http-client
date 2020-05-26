@@ -1,6 +1,6 @@
 # 拦截器
 
-- 拦截器的功能非常重要，可以说是HTTP协议的核心，所有数据都通过它去处理的，可以拦截所有的数据，所以命名为拦截器，它需要实现连接服务器、根据上层的需求去与HTTP服务器进行交互，GET数据、POST数据等，然后还需要处理来自HTTP服务器的响应报文，解析它并且根据响应处理对应的情况，比如重定向、404、重连等，最后获取到数据，递交到上层。
+- 拦截器的功能非常重要，可以说是**HTTP**协议的核心，所有数据都通过它去处理的，可以拦截所有的数据，所以命名为**拦截器**，它需要实现连接服务器、根据上层的需求去与**HTTP**服务器进行交互，**GET**数据、**POST**数据等，然后还需要处理来自**HTTP**服务器的响应报文，解析它并且根据响应处理对应的情况，比如**重定向、404、重连、认证**等，最后获取到数据，递交到上层。
 
 ## 状态结构
 
@@ -58,33 +58,34 @@ typedef struct http_interceptor {
 
 - network：网卡抽象接口，需要底层网络数据通道打交道，对网络数据的读写操作。
 
-- connect_params：连接参数，用于构造HTTP请求相关的字段。
+- connect_params：连接参数，用于构造**HTTP请求**相关的字段。
 
-- request：HTTP请求结构，构造请求相关信息。
+- request：**HTTP请求**结构，构造请求相关信息。
 
-- response：HTTP响应结构，用于处理响应的相关信息。
+- response：**HTTP响应**结构，用于处理响应的相关信息。
 
-- status：状态，描述拦截器当前的处理状态。
+- status：**拦截器的状态**，描述拦截器当前的处理状态。
 
-- message：HTTP报文缓冲区，用于存储写数据时的报文内容，比如在HTTP请求的时候，它保存了HTTP请求报文的起始行、头部、主体等内容。
+- message：**HTTP报文缓冲区**，用于存储写数据时的报文内容，比如在**HTTP请求**的时候，它保存了**HTTP请求**报文的起始行、头部、主体等内容。
 
-- buffer：接收数据缓冲区，接收完数据就递交到上层去。
+- buffer：**接收数据缓冲区**，接收完数据就递交到上层去。
 
-- buffer_len：可以由用户指定的报文缓冲区长度，默认值是`HTTP_DEFAULT_BUF_SIZE`。
+- buffer_len：可以由用户指定的报文缓冲区长度，默认值是**HTTP_DEFAULT_BUF_SIZE**。
 
 - data_process：已经处理的数据长度。
 
-- cmd_timeout:可以由用户指定的超时时间，默认值是`HTTP_DEFAULT_CMD_TIMEOUT`。
+- cmd_timeout:可以由用户指定的超时时间，默认值是**HTTP_DEFAULT_CMD_TIMEOUT**。
 
-- parser：http解析响应报文的数据结构。
+- parser：**http解析响应报文**的数据结构。
 
 - parser_settings：解析报文时响应的配置，其实是指定相应的回调函数。
 
-- evetn：事件回调，在需要的时候通过回调函数处理，将数据上报，比如发生错误的时候、在请求之前、在接收到应答的时候、在解析报文的时候、在解析完成报文的时候、上报body数据的时候等等。
+- evetn：事件回调，在需要的时候通过回调函数处理，将数据上报，比如**发生错误的时候、在请求之前、在接收到应答的时候、在解析报文的时候、在解析完成报文的时候、上报body数据的时候**等等。
 
-- owner：所有者属性，该拦截器是属于哪个上层结构的。
+- owner：**所有者属性**，该拦截器是属于哪个上层结构（**client**）的。
 
 - flag：使用了共用体与结构体描述的一个拦截器标志位：
+
   - again：是否需要重新处理。
   
   - redirects：重定向标志位，拦截器自动处理重定向的内容，这个操作对用户来说是透明的。
@@ -147,7 +148,7 @@ int http_interceptor_set_connect_params(http_interceptor_t *interceptor, http_co
 int http_interceptor_connect(http_interceptor_t *interceptor)
 ```
 
-- 发起HTTP请求，指定请求的方法（GET / POST等），如果是POST还要指定报文主体的内容**post_buf**，也可以为NULL。这个函数中会调用 [HTTP请求](./request.md) 相关的函数，构造起始行，构造报文HTTP请求首部、主体等，然后再通过`_http_write_buffer()`函数将数据发送出去。
+- 发起**HTTP请求**，指定请求的方法（GET / POST等），如果是POST还要指定报文主体的内容**post_buf**，也可以为**NULL**。这个函数中会调用 [HTTP请求](./request.md) 相关的函数，构造起始行，构造报文**HTTP请求**首部、主体等，然后再通过**_http_write_buffer()**函数将数据发送出去。
 
 ```c
 int http_interceptor_request(http_interceptor_t *interceptor, http_request_method_t mothod, const char *post_buf)
@@ -212,5 +213,5 @@ static int _http_interceptor_parser_setting(http_interceptor_t *interceptor)
 
 **上一篇**： [HTTP响应](./response.md)
 
-**下一篇**： [httpclient](./client.md)
+**下一篇**： [工作队列](./work_queue.md)
 

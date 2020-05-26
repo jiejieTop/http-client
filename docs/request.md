@@ -4,7 +4,7 @@
 
 ### 请求方法
 
-定义一个请求方法的映射数组，通过`http_request_method_t`可索引。
+定义一个请求方法的映射数组，通过**http_request_method_t**可索引。
 
 ```c
 typedef enum http_request_method {
@@ -151,7 +151,7 @@ int http_request_init(http_request_t *req)
 int http_request_release(http_request_t *req);
 ```
 
-- http请求报文头部字段初始化，设置请求头部索引`header_index`的值为0，主要填充默认的头部字段，比如默认的长连接`Connection: Keep-Alive`，接受的数据类型`Accept: */* `等。
+- http请求报文头部字段初始化，设置请求头部索引**header_index**的值为0，主要填充默认的头部字段，比如默认的长连接**Connection: Keep-Alive**，接受的数据类型`Accept: */* `等。
 
 ```c
 int http_request_header_init(http_request_t *req)
@@ -183,13 +183,13 @@ int http_request_start_line(http_request_t *req,  http_request_method_t method, 
 int http_request_set_start_line_with_query(http_request_t *req, const char *path, const char *query)
 ```
 
-- 添加请求头部的内容，指定`key： value`，`key`字段内容可参考[HTTP RFC](https://tools.ietf.org/html/rfc2616#section-4.2)，也可参考`HTTP_REQUEST_HEADERS_MAPPING`数组的内容。
+- 添加请求头部的内容，指定**key： value**，**key**字段内容可参考[HTTP RFC](https://tools.ietf.org/html/rfc2616#section-4.2)，也可参考`HTTP_REQUEST_HEADERS_MAPPING`数组的内容。
 
 ```c
 void http_request_add_header(http_request_t *req, const char *key, const char *value)
 ```
 
-- 通过索引的方式添加请求头部的`value`字段，如果存在则不会添加。
+- 通过索引的方式添加请求头部的**value**字段，如果存在则不会添加。
 
 ```c
 void http_request_add_header_form_index(http_request_t *req, http_request_header_t header, const char *value)
@@ -205,13 +205,13 @@ char *http_request_get_header(http_request_t *req, const char *key)
 char *http_request_get_header_form_index(http_request_t *req, http_request_header_t index)
 ```
 
-- 设置请求报文的主体部分，此操作会填充请求头部的`Content-Length:`字段。
+- 设置请求报文的主体部分，此操作会填充请求头部的**Content-Length:**`字段。
 
 ```c
 int http_request_set_body(http_request_t *req, const char *buf, size_t size)
 ```
 
-- 通过指针引用的方式设置报文主体部分，此操作是为了避免占用太大的内存消耗，而且会填充请求头部的`Content-Length:`字段。
+- 通过指针引用的方式设置报文主体部分，此操作是为了避免占用太大的内存消耗，而且会填充请求头部的**Content-Length:**字段。
 
 ```c
 int http_request_set_body_form_pointer(http_request_t *req, const char *buf, size_t size)

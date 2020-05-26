@@ -25,7 +25,7 @@ typedef struct platform_timer {
 void platform_timer_init(platform_timer_t* timer)
 ```
 
-- 开始倒计时，超时的时间是`timeout`。
+- 开始倒计时，超时的时间是**timeout**。
 
 ```c
 void platform_timer_cutdown(platform_timer_t* timer, unsigned int timeout)

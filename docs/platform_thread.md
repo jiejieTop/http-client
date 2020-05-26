@@ -16,7 +16,7 @@ typedef struct platform_thread {
 } platform_thread_t;
 ```
 
-封装了POSIX线程库的一些内容，使用到互斥锁（linux平台）。
+封装了**POSIX**线程库的一些内容，使用到互斥锁（linux平台）。
 
 ## 外部函数
 
@@ -53,6 +53,12 @@ void platform_thread_start(platform_thread_t* thread)
 
 ```c
 void platform_thread_destroy(platform_thread_t* thread);
+```
+
+- 等待线程退出，主要是是工作队列中使用。
+
+```c
+void platform_thread_wait_exit(platform_thread_t* thread);
 ```
 
 ## 依赖
