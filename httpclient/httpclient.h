@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-22 22:15:00
+ * @LastEditTime: 2020-05-26 19:25:07
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTPCLIENT_H_
@@ -13,7 +13,6 @@
 
 #include "http_parser.h"
 #include "http_utils.h"
-#include "http_connector.h"
 #include "http_url_parser.h"
 #include "http_interceptor.h"
 
@@ -30,7 +29,6 @@
 
 
 typedef struct http_client {
-    http_connect_status_t               status;
     http_list_t                         list;
     platform_mutex_t                    global_lock;
     http_interceptor_t                  *interceptor;

@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 00:42:16
- * @LastEditTime: 2020-05-25 23:37:49
+ * @LastEditTime: 2020-05-26 19:41:15
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_CONFIG_H_
@@ -30,11 +30,9 @@
 #define     HTTP_YES                            1
 
 #define     HTTP_DEFAULT_BUF_SIZE               1024
-#define     HTTP_DEFAULT_CMD_TIMEOUT            10000
-#define     HTTP_MAX_CMD_TIMEOUT                20000
+#define     HTTP_DEFAULT_CMD_TIMEOUT            20000
+#define     HTTP_MAX_CMD_TIMEOUT                40000
 #define     HTTP_MIN_CMD_TIMEOUT                1000
-#define     HTTP_KEEP_ALIVE_INTERVAL            20      // unit: second
-#define     HTTP_RECONNECT_DEFAULT_DURATION     1000
 #define     HTTP_THREAD_STACK_SIZE              2048
 #define     HTTP_THREAD_PRIO                    10
 #define     HTTP_THREAD_TICK                    50

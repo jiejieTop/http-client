@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-25 23:38:34
+ * @LastEditTime: 2020-05-26 19:25:22
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -50,18 +50,6 @@ static void _http_client_wq_handle(void *client)
                              c,
                              _http_client_internal_event_handle);
     http_client_release(c);
-}
-
-http_connect_status_t http_get_connect_status(http_client_t *c)
-{
-    return c->status;
-}
-
-void http_set_connect_status(http_client_t *c, http_connect_status_t state)
-{
-    platform_mutex_lock(&c->global_lock);
-    c->status = state;
-    platform_mutex_unlock(&c->global_lock);
 }
 
 int _http_client_create(void)
@@ -176,7 +164,7 @@ void http_client_exit(void)
     http_client_t *c = NULL;
     
 #ifdef HTTP_USING_WORK_QUEUE
-    http_wq_pool_deinit();
+    http_wq_wait_exit();
 #endif
 
     do {
@@ -196,7 +184,6 @@ void http_client_exit(void)
         _http_client_destroy(c);
         platform_memory_free(c);
     } while (c != NULL);
-    
 }
 
 

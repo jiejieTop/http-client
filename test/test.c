@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-11 21:53:07
- * @LastEditTime: 2020-05-25 23:34:11
+ * @LastEditTime: 2020-05-26 16:54:34
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include <stdio.h>
@@ -22,7 +22,7 @@ int main(void)
 
     http_client_init(ca_get());
 
-    // http_url_parsing_test();
+    http_url_parsing_test();
 
     http_get_test();
 
@@ -32,9 +32,9 @@ int main(void)
 
     http_get_file_test();
 
-    // http_client_exit();
+    http_client_exit();
 
-    sleep(50);
+    // sleep(50);
     
     return 0;
 }

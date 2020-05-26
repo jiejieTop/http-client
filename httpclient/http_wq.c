@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-21 20:59:27
- * @LastEditTime: 2020-05-25 23:28:19
+ * @LastEditTime: 2020-05-26 17:17:18
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <http_wq.h>
@@ -12,10 +12,22 @@
 
 static http_wq_pool_t _wq_pool;
 
+static http_worker_t *_http_get_frist_worker(http_wq_t *wq)
+{
+    http_worker_t *w = NULL;
+
+    platform_mutex_lock(&wq->mutex);
+    w = HTTP_LIST_FIRST_ENTRY_OR_NULL(&wq->list, http_worker_t, entry);
+    platform_mutex_unlock(&wq->mutex);
+
+    return w;
+}
+
 static int _http_wq_worker_create(http_wq_t *wq, http_worker_func_t func, void *data, size_t len)
 {
     http_worker_t *w = NULL;
     w = platform_memory_alloc(sizeof(http_worker_t));
+    memset(w, 0, sizeof(http_worker_t));
     HTTP_ROBUSTNESS_CHECK(w, HTTP_MEM_NOT_ENOUGH_ERROR);
 
     w->wq = wq;
@@ -53,15 +65,18 @@ static void _http_wq_thread(void *arg)
     http_wq_t *wq = (http_wq_t *)arg;
 
     while (wq->loop) {
-        platform_mutex_lock(&wq->mutex);
-        w = HTTP_LIST_FIRST_ENTRY_OR_NULL(&wq->list, http_worker_t, entry);
-        platform_mutex_unlock(&wq->mutex);
+        w = _http_get_frist_worker(wq);
 
+    start_working:
         if (NULL != w) {
             if (w->func) {
                 w->func(w->data);
             }
             _http_wq_worker_destroy(w);
+
+            if ((w = _http_get_frist_worker(wq)) != NULL) {
+                goto start_working;
+            }
         } else {
             platform_thread_stop(wq->thread);
         }
@@ -70,13 +85,11 @@ static void _http_wq_thread(void *arg)
 
 static int _http_wq_init(http_wq_t *wq)
 {
-    if (!wq) {
-        return -1;
-    }
+    HTTP_ROBUSTNESS_CHECK(wq, HTTP_NULL_VALUE_ERROR)
 
-    http_list_init(&wq->list);
     wq->loop = 1;
-
+    http_list_init(&wq->list);
+    
     platform_mutex_init(&wq->mutex);
 
     wq->thread= platform_thread_init("_http_wq_thread", _http_wq_thread, wq, HTTP_THREAD_STACK_SIZE, HTTP_THREAD_PRIO, HTTP_THREAD_TICK);
@@ -89,28 +102,34 @@ static int _http_wq_init(http_wq_t *wq)
     return 0;
 }
 
-static http_worker_t *_http_get_worker(http_wq_t *wq)
-{
-    return HTTP_LIST_FIRST_ENTRY_OR_NULL(&wq->list, http_worker_t, entry);
-}
-
 static void _http_wq_deinit(http_wq_t *wq)
 {
     http_worker_t *w;
     HTTP_ROBUSTNESS_CHECK(wq, HTTP_VOID)
 
-    platform_mutex_lock(&wq->mutex);
-
-    while ((w = _http_get_worker(wq))) {
-        platform_mutex_unlock(&wq->mutex);
+    while ((w = _http_get_frist_worker(wq))) {
         _http_wq_worker_destroy(w);
-        platform_mutex_lock(&wq->mutex);
     }
 
-    platform_mutex_unlock(&wq->mutex);
     wq->loop = 0;
 
     platform_thread_destroy(wq->thread);
+    wq->thread = NULL;
+}
+
+static void _http_wq_wait(http_wq_t *wq)
+{
+    http_worker_t *w;
+    HTTP_ROBUSTNESS_CHECK(wq, HTTP_VOID)
+
+    if (NULL != wq->thread) {
+        platform_thread_startup(wq->thread);
+        platform_thread_start(wq->thread);       /* start run mqtt thread */
+    }
+
+    wq->loop = 0;
+    platform_thread_wait_exit(wq->thread);
+    wq->thread = NULL;
 }
 
 int http_wq_pool_init(void)
@@ -171,4 +190,14 @@ int http_wq_add_task(http_worker_func_t func, void *data, size_t len)
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
+void http_wq_wait_exit(void)
+{
+    int i;
+    http_wq_t *wq = _wq_pool.wq;
+    HTTP_ROBUSTNESS_CHECK(wq, HTTP_VOID)
+
+    for (i = 0; i < _wq_pool.cpus; ++i, ++wq) {
+        _http_wq_wait(wq);
+    }
+}
 
