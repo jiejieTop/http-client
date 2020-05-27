@@ -1,6 +1,6 @@
 # post 方法测试
 
-主要验证**http**的**post方法**，此处测试了2个url，有tcp直连方式也有tls加密方式，均是正常的，**httpbin.org**这个网站就是用于测试http协议的利器。
+主要验证 **http** 的 **post 方法**，此处测试了 2 个 url，有 tcp 直连方式也有 tls 加密方式，均是正常的，**httpbin.org** 这个网站就是用于测试 http 协议的利器。
 
 ## 动态图演示
 
@@ -103,6 +103,6 @@ void http_post_test(void)
 ---------------------- http_post_test end ----------------------
 ```
 
-**上一篇**：[get方法测试](./test_get.md)
+**上一篇**：[get 方法测试](./test_get.md)
 
-**下一篇**： [重定向测试](./test_redirect.md)
+**下一篇**：[重定向测试](./test_redirect.md)

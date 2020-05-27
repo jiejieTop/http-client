@@ -1,6 +1,6 @@
 # 获取文件测试
 
-通过url去获取相关的资源文件并且将其写到文件中，文件的处理逻辑是自己写的，核心还是**http_client_get()**函数。
+通过 url 去获取相关的资源文件并且将其写到文件中，文件的处理逻辑是自己写的，核心还是 **http_client_get()** 函数。
 
 ## 动态图演示
 
@@ -40,13 +40,12 @@ static void printf_progress_bar(size_t process, size_t total)
     count = (process * 100) / total;
     if (count < 0)
         return;
-    
+
     buf[count] = '#';
 
     printf("[%-101s][%%%d]%c\r", buf, count, stat[count%4]);
     fflush(stdout);
 }
-
 
 static int _http_cb1(void *e)
 {
@@ -61,11 +60,11 @@ static int _http_cb1(void *e)
         http_interceptor_t *interceptor = client->interceptor;
 
         pbuf1_len = http_response_get_length(&interceptor->response);
-        
+
         printf("\nfile size : %ld KB\n", pbuf1_len);
         pbuf1 = platform_memory_alloc(pbuf1_len);
     }
-    
+
     memcpy(pbuf1 + process_len, event->data, event->len);
 
     process_len += event->len;
@@ -93,7 +92,7 @@ static int _http_cb2(void *e)
         printf("\nfile size : %ld KB\n", pbuf2_len);
         pbuf2 = platform_memory_alloc(pbuf2_len);
     }
-    
+
     memcpy(pbuf2 + process_len, event->data, event->len);
 
     process_len += event->len;
@@ -114,13 +113,13 @@ static int _http_cb3(void *e)
     if (NULL == pbuf3) {
         http_client_t *client = event->context;
         http_interceptor_t *interceptor = client->interceptor;
-        
+
         pbuf3_len = http_response_get_length(&interceptor->response);
 
         printf("\nfile size : %ld KB\n", pbuf3_len);
         pbuf3 = platform_memory_alloc(pbuf3_len);
     }
-    
+
     memcpy(pbuf3 + process_len, event->data, event->len);
 
     process_len += event->len;
@@ -139,7 +138,7 @@ void http_get_file_test(void)
     http_client_get(URL1, _http_cb1);
     if (pbuf1_len) {
         fp = fopen(FILE_NAME1, "wb");
-        
+
         if (fp == NULL) {
             printf("\nopen %s file fail ...\n", FILE_NAME1);
         } else {
@@ -155,7 +154,7 @@ void http_get_file_test(void)
     http_client_get(URL2, _http_cb2);
     if (pbuf2_len) {
         fp = fopen(FILE_NAME2, "wb");
-        
+
         if (fp == NULL) {
             printf("\nopen %s file fail ...\n", FILE_NAME2);
         } else {
@@ -171,7 +170,7 @@ void http_get_file_test(void)
     http_client_get(URL3, _http_cb3);
     if (pbuf3_len) {
         fp = fopen(FILE_NAME3, "wb");
-        
+
         if (fp == NULL) {
             printf("\nopen %s file fail ...\n", FILE_NAME3);
         } else {
@@ -188,10 +187,9 @@ void http_get_file_test(void)
 }
 ```
 
-
 ## 现象
 
-此处是获取两个图片与一个**WeChatSetup.exe**文件。
+此处是获取两个图片与一个 **WeChatSetup.exe** 文件。
 
 ```bash
 ---------------------- http_get_file_test start ----------------------
@@ -213,4 +211,4 @@ open WeChatSetup.exe file success ...
 
 **上一篇**：[重定向测试](./test_redirect.md)
 
-**下一篇**： [待定](./test_get_file.md)
+**下一篇**：[待定](./test_get_file.md)

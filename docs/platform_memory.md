@@ -8,31 +8,30 @@
 
 ## 外部函数
 
-- 动态分配**size**大小的内存。
+- 动态分配 **size** 大小的内存。
 
-```c
-void *platform_memory_alloc(size_t size)
-```
+    ```c
+    void *platform_memory_alloc(size_t size)
+    ```
 
 - 分配内存。
 
-```c
-void *platform_memory_calloc(size_t num, size_t size)`
-```
+    ```c
+    void *platform_memory_calloc(size_t num, size_t size)`
+    ```
 
 - 重新追加分配内存。
-- 
-```c
-void *platform_memory_realloc(void *ptr, size_t size)
-```
+
+    ```c
+    void *platform_memory_realloc(void *ptr, size_t size)
+    ```
 
 - 释放动态申请的内存。
 
-```c
-void platform_memory_free(void *ptr)
-```
-
+    ```c
+    void platform_memory_free(void *ptr)
+    ```
 
 **上一篇**：[开发计划](./plan.md)
 
-**下一篇**： [平台抽象层—时间管理](./platform_timer.md)
+**下一篇**：[平台抽象层—时间管理](./platform_timer.md)

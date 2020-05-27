@@ -16,56 +16,55 @@ typedef struct platform_thread {
 } platform_thread_t;
 ```
 
-封装了**POSIX**线程库的一些内容，使用到互斥锁（linux平台）。
+封装了 **POSIX** 线程库的一些内容，使用到互斥锁（linux 平台）。
 
 ## 外部函数
 
-- 创建线程，指定线程的名字、线程主体、线程的传入参数、线程栈大小、优先级、时间片等，这个封装的接口在linux平台并不会全部参数都使用上，但为了兼容其他平台，只好这样子封装。
-```c
-platform_thread_t *platform_thread_init( const char *name,
-                                        void (*entry)(void *),
-                                        void * const param,
-                                        unsigned int stack_size,
-                                        unsigned int priority,
-                                        unsigned int tick);
-```
+- 创建线程，指定线程的名字、线程主体、线程的传入参数、线程栈大小、优先级、时间片等，这个封装的接口在 linux 平台并不会全部参数都使用上，但为了兼容其他平台，只好这样子封装。
 
+    ```c
+    platform_thread_t *platform_thread_init( const char *name,
+                                            void (*entry)(void *),
+                                            void * const param,
+                                            unsigned int stack_size,
+                                            unsigned int priority,
+                                            unsigned int tick);
+    ```
 
 - 启动调度器（在某些平台需要）。
 
-```c
-void platform_thread_startup(platform_thread_t* thread)
-```
+    ```c
+    void platform_thread_startup(platform_thread_t* thread)
+    ```
 
 - 停止线程。
 
-```c
-void platform_thread_stop(platform_thread_t* thread)
-```
+    ```c
+    void platform_thread_stop(platform_thread_t* thread)
+    ```
 
-- 启动线程
+- 启动线程。
 
-```c
-void platform_thread_start(platform_thread_t* thread)
-```
+    ```c
+    void platform_thread_start(platform_thread_t* thread)
+    ```
 
 - 销毁线程。
 
-```c
-void platform_thread_destroy(platform_thread_t* thread);
-```
+    ```c
+    void platform_thread_destroy(platform_thread_t* thread);
+    ```
 
 - 等待线程退出，主要是是工作队列中使用。
 
-```c
-void platform_thread_wait_exit(platform_thread_t* thread);
-```
+    ```c
+    void platform_thread_wait_exit(platform_thread_t* thread);
+    ```
 
 ## 依赖
 
-- #include <pthread.h>
-
+- `#include <pthread.h>`
 
 **上一篇**：[平台抽象层—时间管理](./platform_timer.md)
 
-**下一篇**： [平台抽象层—互斥锁](./platform_mutex.md)
+**下一篇**：[平台抽象层—互斥锁](./platform_mutex.md)
