@@ -47,7 +47,7 @@
 
 ## 文档说明
 
-欢迎各位朋友参与进来开发，所有的功能实现都有详细的文档介绍，大家可以选择 **开发计划** 中的项目进行开发、探讨、提交PR，也欢迎大家提交功能需求，本项目将由 [杰杰](https://github.com/jiejieTop) 持续维护。
+欢迎各位朋友参与进来开发，所有的功能实现都有详细的文档介绍，大家可以选择 **[开发计划](./docs/plan.md)** 中的项目进行开发、探讨、提交PR，也欢迎大家提交功能需求，本项目将由 **[杰杰](https://github.com/jiejieTop)** 持续维护。
 
 - [开发计划](./docs/plan.md)
 
@@ -129,7 +129,7 @@ sudo apt-get install -y cmake gcc g++
  ./build/bin/http-client
 ```
 
-观察测试结果，满足要求后提交 `PR`。
+观察测试结果，满足要求后提交 **PR**。
 
 [如何提交PR？](./docs/how_to_pr.md)
 
@@ -144,3 +144,7 @@ http-client 遵循 [Apache License v2.0](https://github.com/jiejieTop/http-clien
 ## Star & Fork
 
 后续我还会提供更多开源项目。也非常欢迎大家设计、开发更多实用插件和功能，一起来完善 [http-client](https://github.com/jiejieTop/http-client)。如果觉得这个开源项目很赞，可以点击项目主页 右上角的 **Star** & **Fork**，同时把它推荐给更多有需要的朋友。
+
+## 感谢参与贡献的开发者
+
+<a href=https://github.com/murphyzhao> <img height="80" width="80" src="http://qiniu.jiejie01.top/contributing-murphyzhao.png"/></a>
