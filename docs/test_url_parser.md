@@ -1,6 +1,6 @@
-# url解析测试
+# url 解析测试
 
-通过查看解析的url，判断解析是否正常。
+通过查看解析的 url，判断解析是否正常。
 
 ## 动态图演示
 
@@ -44,7 +44,6 @@ void http_url_parsing_test(void)
 
 ## 现象
 
-
 ```bash
 ---------------------- http_url_parsing_test start ----------------------
 url:http://jiejie:test@jiedev.com/index.php?who=jiejie&is=test#frag
@@ -60,5 +59,4 @@ farg:frag
 ---------------------- http_url_parsing_test end ----------------------
 ```
 
-
-**下一篇**： [get方法测试](./test_get.md)
+**下一篇**： [get 方法测试](./test_get.md)

@@ -1,6 +1,6 @@
 # get 方法测试
 
-主要验证**http**的**get方法**，此处测试了3个url，有tcp直连方式也有tls加密方式，均是正常的。
+主要验证 **http** 的 **get 方法**，此处测试了 3 个 url，有 tcp 直连方式也有 tls 加密方式，均是正常的。
 
 ## 动态图演示
 
@@ -33,7 +33,7 @@ void http_get_test(void)
     printf("\n---------------------- http_get_test start ----------------------\n");
 
     http_client_init(ca_get());
-    
+
     printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
     http_client_get(URL1, _http_cb);
     printf("\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
@@ -49,7 +49,6 @@ void http_get_test(void)
     printf("\n---------------------- http_get_test end ----------------------\n");
 }
 ```
-
 
 ## 现象
 
@@ -155,6 +154,6 @@ void http_get_test(void)
 ---------------------- http_get_test end ----------------------
 ```
 
-**上一篇**：[url解析测试](./test_url_parser.md)
+**上一篇**：[url 解析测试](./test_url_parser.md)
 
-**下一篇**： [post方法测试](./test_post.md)
+**下一篇**：[post 方法测试](./test_post.md)
