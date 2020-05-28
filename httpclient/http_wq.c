@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-21 20:59:27
- * @LastEditTime: 2020-05-26 21:17:16
+ * @LastEditTime: 2020-05-28 17:23:47
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <http_wq.h>
@@ -64,6 +64,8 @@ static void _http_wq_thread(void *arg)
     http_worker_t *w = NULL;
     http_wq_t *wq = (http_wq_t *)arg;
 
+    platform_thread_notice_enter(wq->thread);
+
     while (wq->loop) {
         w = _http_get_frist_worker(wq);
 
@@ -81,6 +83,7 @@ static void _http_wq_thread(void *arg)
             platform_thread_stop(wq->thread);
         }
     }
+    platform_thread_notice_exit(wq->thread);
 }
 
 static int _http_wq_init(http_wq_t *wq)
