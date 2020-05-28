@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-15 18:31:44
- * @LastEditTime : 2020-01-08 20:24:17
+ * @LastEditTime: 2020-05-28 20:19:38
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _PLATFORM_THREAD_H_
@@ -11,7 +11,8 @@
 #include "tos_k.h"
 
 typedef struct platform_thread {
-    k_task_t thread;
+    k_task_t    thread;
+    k_sem_t     sem;
 } platform_thread_t;
 
 platform_thread_t *platform_thread_init( const char *name,
@@ -24,5 +25,8 @@ void platform_thread_startup(platform_thread_t* thread);
 void platform_thread_stop(platform_thread_t* thread);
 void platform_thread_start(platform_thread_t* thread);
 void platform_thread_destroy(platform_thread_t* thread);
+void platform_thread_notice_enter(platform_thread_t* thread);
+void platform_thread_notice_exit(platform_thread_t* thread);
+void platform_thread_wait_exit(platform_thread_t* thread);
 
 #endif

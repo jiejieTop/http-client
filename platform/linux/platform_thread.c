@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-23 19:26:27
- * @LastEditTime: 2020-05-26 17:23:07
+ * @LastEditTime: 2020-05-28 17:22:07
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "string.h"
@@ -38,8 +38,7 @@ platform_thread_t *platform_thread_init( const char *name,
 
 void platform_thread_startup(platform_thread_t* thread)
 {
-    return;
-    // (void) thread;
+    (void) thread;
 }
 
 void platform_thread_stop(platform_thread_t* thread)
@@ -67,6 +66,16 @@ void platform_thread_destroy(platform_thread_t* thread)
         pthread_cond_destroy(&thread->cond);
         pthread_mutex_destroy(&thread->mutex);
     }
+}
+
+void platform_thread_notice_enter(platform_thread_t* thread)
+{
+    (void) thread;
+}
+
+void platform_thread_notice_exit(platform_thread_t* thread)
+{
+    (void) thread;
 }
 
 void platform_thread_wait_exit(platform_thread_t* thread)

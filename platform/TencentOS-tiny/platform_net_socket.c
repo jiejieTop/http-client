@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-01-10 23:45:59
- * @LastEditTime: 2020-04-25 17:54:44
+ * @LastEditTime: 2020-05-28 21:18:10
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "platform_net_socket.h"
@@ -21,8 +21,15 @@ int platform_net_socket_connect(const char *host, const char *port, int proto)
     
 #else
     
+    int need_record = 0;
     struct addrinfo hints, *addr_list, *cur;
-    
+    char ip[16] = {0};
+    const char *host_ip = NULL;
+
+    if ((host_ip = routing_search(host)) == NULL) {
+        need_record = 1;
+        host_ip = host;
+    }
     /* Do name resolution with both IPv6 and IPv4 */
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
@@ -42,6 +49,12 @@ int platform_net_socket_connect(const char *host, const char *port, int proto)
 
         if (connect(fd, cur->ai_addr, cur->ai_addrlen) == 0) {
             ret = fd;
+
+            if (need_record == 1) {
+                inet_ntop(cur->ai_family, &(((struct sockaddr_in *)(cur->ai_addr))->sin_addr), ip, 16);
+                routing_record(host, ip);
+            }
+
             break;
         }
 
@@ -69,30 +82,35 @@ int platform_net_socket_recv_timeout(int fd, unsigned char *buf, int len, int ti
 #ifdef HTTP_NETSOCKET_USE_AT
     return tos_sal_module_recv_timeout(fd, buf, len, timeout);
 #else
-    int rc;
-    int bytes = 0;
-	struct timeval tv = {
+    int nread;
+    int nleft = len;
+    char *ptr; 
+    ptr = buf;
+
+    struct timeval tv = {
         timeout / 1000, 
         (timeout % 1000) * 1000
     };
     
-	if (tv.tv_sec < 0 || (tv.tv_sec == 0 && tv.tv_usec <= 0)) {
-		tv.tv_sec = 0;
-		tv.tv_usec = 100;
-	}
+    if (tv.tv_sec < 0 || (tv.tv_sec == 0 && tv.tv_usec <= 0)) {
+        tv.tv_sec = 0;
+        tv.tv_usec = 100;
+    }
 
-	platform_net_socket_setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
+    platform_net_socket_setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
 
-	while (bytes < len) {
-		rc = platform_net_socket_recv(fd, &buf[bytes], (size_t)(len - bytes), 0);
-		if (rc <= 0) {
-			bytes = rc;
-			break;
-		} else {
-			bytes += rc;
-		}
-	}
-	return bytes;
+    while (nleft > 0) {
+        nread = platform_net_socket_recv(fd, ptr, nleft, 0);
+        if (nread < 0) {
+            return -1;
+        } else if (nread == 0) {
+            break;
+        }
+
+        nleft -= nread;
+        ptr += nread;
+    }
+    return len - nleft;
 #endif
 }
 
