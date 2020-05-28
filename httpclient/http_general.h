@@ -41,6 +41,27 @@
     HTTP_SET_CONNECT_PARAMS_STATEMENT(name, type)                           \
     HTTP_GET_CONNECT_PARAMS_STATEMENT(name, type)
 
+#define HTTP_FREE_CONNECT_PARAMS(conn, name)                                \
+    do {                                                                    \
+        if ( NULL != ( conn->http_##name ) ) {                                \
+            platform_memory_free( conn->http_##name );                  \
+            conn->http_##name = NULL;                                   \
+        }                                                                   \
+    } while(0)
+
+#define HTTP_FREE_ALL_CONNECT_PARAMS(conn)                                  \
+    do {                                                                    \
+        HTTP_FREE_CONNECT_PARAMS(conn, url);                                \
+        HTTP_FREE_CONNECT_PARAMS(conn, scheme);                             \
+        HTTP_FREE_CONNECT_PARAMS(conn, host);                               \
+        HTTP_FREE_CONNECT_PARAMS(conn, user);                               \
+        HTTP_FREE_CONNECT_PARAMS(conn, password);                           \
+        HTTP_FREE_CONNECT_PARAMS(conn, path);                               \
+        HTTP_FREE_CONNECT_PARAMS(conn, query);                              \
+        HTTP_FREE_CONNECT_PARAMS(conn, farg);                               \
+        HTTP_FREE_CONNECT_PARAMS(conn, cert_pem);                           \
+        HTTP_FREE_CONNECT_PARAMS(conn, port);                               \
+    } while(0)
 
 typedef struct http_connect_params {
     char                        *http_url;

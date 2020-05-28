@@ -17,7 +17,7 @@
 /* url:<scheme>://<user>:<password>@<host>:<port>/<path>;<params>?<query>#<frag>
  * test:"https://jiejie:test@jiedev.com:8080/test/index.php?who=jiejie#frag"
  */
-int http_url_parsing(http_connect_params_t *connect_params, const char *url)  
+int http_url_parsing(http_connect_params_t *connect_params, const char *url)
 {
     size_t len = 0;
     struct http_parser_url u;
@@ -30,7 +30,7 @@ int http_url_parsing(http_connect_params_t *connect_params, const char *url)
 
     http_utils_assign_string(&connect_params->http_url, url, len);
 
-    if (0 != http_parser_parse_url(url, len, 0, &u)) { 
+    if (0 != http_parser_parse_url(url, len, 0, &u)) {
         HTTP_LOG_D("error parse url : %s", url);
         RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
     }
@@ -45,13 +45,29 @@ int http_url_parsing(http_connect_params_t *connect_params, const char *url)
         HTTP_ROBUSTNESS_CHECK(connect_params->http_scheme, HTTP_MEM_NOT_ENOUGH_ERROR);
 
         if (http_utils_ignore_case_match(connect_params->http_scheme, "https") == 0) {
-            connect_params->http_port = DEFAULT_HTTPS_PORT;
+            char *port = NULL;
+            port = (char *)platform_memory_alloc(sizeof(DEFAULT_HTTPS_PORT));
+            if (NULL != port) {
+                memset(port, 0, sizeof(DEFAULT_HTTPS_PORT));
+                memcpy(port, DEFAULT_HTTPS_PORT, sizeof(DEFAULT_HTTPS_PORT));
+                connect_params->http_port = port;
+            } else {
+                connect_params->http_port = DEFAULT_HTTPS_PORT;
+            }
         } else if(http_utils_ignore_case_match(connect_params->http_scheme, "http") == 0) {
-            connect_params->http_port = DEFAULT_HTTP_PORT;
+            char *port = NULL;
+            port = (char *)platform_memory_alloc(sizeof(DEFAULT_HTTP_PORT));
+            if (NULL != port) {
+                memset(port, 0, sizeof(DEFAULT_HTTP_PORT));
+                memcpy(port, DEFAULT_HTTP_PORT, sizeof(DEFAULT_HTTP_PORT));
+                connect_params->http_port = port;
+            } else {
+                connect_params->http_port = DEFAULT_HTTP_PORT;
+            }
         }
     }
 
-    if(u.field_data[UF_PORT].len) { 
+    if(u.field_data[UF_PORT].len) {
         http_utils_assign_string(&connect_params->http_port, url + u.field_data[UF_PORT].off, u.field_data[UF_PORT].len);
         HTTP_ROBUSTNESS_CHECK(connect_params->http_host, HTTP_MEM_NOT_ENOUGH_ERROR)
     }
