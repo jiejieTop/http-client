@@ -147,4 +147,6 @@ http-client 遵循 [Apache License v2.0](https://github.com/jiejieTop/http-clien
 
 ## 感谢参与贡献的开发者
 
-<a href=https://github.com/murphyzhao> <img height="80" width="80" src="http://qiniu.jiejie01.top/contributing-murphyzhao.png"/></a>
+<a href=https://github.com/murphyzhao> <img height="90" width="90" src="./png/contributors/murphyzhao.png"/></a>
+<a href=https://github.com/LinTeX9527> <img height="90" width="90" src="./png/contributors/LinTeX9527.png"/></a>
+
