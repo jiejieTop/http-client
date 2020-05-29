@@ -36,10 +36,11 @@ http_connect_params_t *http_assign_connect_params(void)
 
 void http_release_connect_params(http_connect_params_t *connect_params)
 {
-    if (NULL != connect_params)
+    if (NULL != connect_params) {
         HTTP_FREE_ALL_CONNECT_PARAMS(connect_params);
         platform_memory_free(connect_params);
         connect_params = NULL;
+    }
 }
 
 
