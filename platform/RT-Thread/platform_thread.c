@@ -79,7 +79,7 @@ void platform_thread_notice_enter(platform_thread_t* thread)
 
 void platform_thread_notice_exit(platform_thread_t* thread)
 {
-    rt_mutex_release(thread->sem);
+    rt_sem_release(thread->sem);
 }
 
 void platform_thread_wait_exit(platform_thread_t* thread)

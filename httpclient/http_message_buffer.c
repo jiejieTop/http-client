@@ -77,7 +77,7 @@ void http_message_buffer_release(http_message_buffer_t *buf)
 void http_message_buffer_concat(http_message_buffer_t *buf, ...)
 {
     va_list ap;
-    ssize_t total;
+    size_t total;
 
     va_start(ap, buf);
     total = buf->used + http_utils_count_concat(&ap);
@@ -106,7 +106,7 @@ void http_message_buffer_append(http_message_buffer_t *buf, const char *str, siz
 void http_message_buffer_cover(http_message_buffer_t *buf, ...)
 {
     va_list ap;
-    ssize_t total;
+    size_t total;
 
     va_start(ap, buf);
     total = 1 + http_utils_count_concat(&ap);

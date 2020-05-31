@@ -19,7 +19,7 @@ typedef struct network {
     const char                  *host;
     const char                  *port;
     const char                  *ca_crt;
-    size_t                      ca_crt_len;
+    unsigned int                ca_crt_len;
     unsigned int                timeout_ms;            // SSL handshake timeout in millisecond
     void                        *nettype_tls_params;
 } network_t;

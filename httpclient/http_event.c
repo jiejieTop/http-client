@@ -37,6 +37,7 @@ int http_event_register(http_event_t *event, http_event_cb_t cb)
 {
     HTTP_ROBUSTNESS_CHECK((event && cb), HTTP_NULL_VALUE_ERROR);
     event->cb = cb;
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 int http_event_dispatch(http_event_t *event, http_event_type_t type, void *context, void *data, size_t len)
