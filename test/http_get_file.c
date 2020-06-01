@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-16 22:23:05
- * @LastEditTime: 2020-06-02 00:11:09
+ * @LastEditTime: 2020-06-02 00:21:59
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <stdio.h>
@@ -79,7 +79,7 @@ static int _http_cb1(void *e)
         fflush(fp);
         fclose(fp);
         platform_memory_free(pbuf1);
-        pbuf3 = NULL;
+        pbuf1 = NULL;
     }
     return 0;
 }

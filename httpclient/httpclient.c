@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-06-01 23:52:37
+ * @LastEditTime: 2020-06-02 00:30:32
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -33,10 +33,8 @@ static int _http_client_internal_event_handle(void *e)
     http_client_t *c = (http_client_t*)interceptor->owner;
 
     c->process = interceptor->data_process;
-
-    if (c->total == 0)
-        c->total = http_response_get_length(&interceptor->response);
-
+    c->total = http_response_get_length(&interceptor->response);
+    
     if (0 == c->interest_event)
         RETURN_ERROR(HTTP_SUCCESS_ERROR);
 
@@ -215,6 +213,8 @@ void http_client_release(http_client_t *c)
 
     platform_mutex_lock(&_client_pool_lock);
 
+    _http_client_variables_init(c);
+
     http_list_del(&c->list);
     http_list_add(&c->list, &_http_client_free_list);
 
@@ -223,8 +223,6 @@ void http_client_release(http_client_t *c)
     http_interceptor_release(c->interceptor);
 
     http_release_connect_params_variables(c->connect_params);
-
-    _http_client_variables_init(c);
 }
 
 void http_client_set_interest_event(http_client_t *c, http_event_type_t event)
