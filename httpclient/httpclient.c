@@ -17,6 +17,15 @@ static http_list_t _http_client_free_list;
 static http_list_t _http_client_used_list;
 static platform_mutex_t _client_pool_lock;
 
+static void _http_client_variables_init(http_client_t *c)
+{
+    c->method = HTTP_REQUEST_METHOD_INVALID;
+    c->interest_event = 0;
+    c->process = 0;
+    c->total = 0;
+    c->data = NULL;
+}
+
 static int _http_client_internal_event_handle(void *e)
 {
     http_event_t *event = e;
@@ -24,7 +33,9 @@ static int _http_client_internal_event_handle(void *e)
     http_client_t *c = (http_client_t*)interceptor->owner;
 
     c->process = interceptor->data_process;
-    c->total = http_response_get_length(&interceptor->response);
+
+    if (c->total == 0)
+        c->total = http_response_get_length(&interceptor->response);
 
     if (0 == c->interest_event)
         RETURN_ERROR(HTTP_SUCCESS_ERROR);
@@ -209,7 +220,11 @@ void http_client_release(http_client_t *c)
 
     platform_mutex_unlock(&_client_pool_lock);
 
+    http_release_connect_params(c->connect_params);
+
     http_interceptor_release(c->interceptor);
+
+    _http_client_variables_init(c);
 }
 
 void http_client_set_interest_event(http_client_t *c, http_event_type_t event)
