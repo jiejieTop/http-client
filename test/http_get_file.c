@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-16 22:23:05
- * @LastEditTime: 2020-05-25 23:37:20
+ * @LastEditTime: 2020-06-02 00:11:09
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */ 
 #include <stdio.h>
@@ -126,18 +126,26 @@ static int _http_cb2(void *e)
 
 static int _http_cb3(void *e)
 {
+    static FILE *fp =NULL;
     static size_t process_len = 0;
     http_event_t *event = e;
-
+    http_client_t *client = event->context;
+    
     if (event->len <= 0)
         return -1;
 
     if (NULL == pbuf3) {
-        http_client_t *client = event->context;
         pbuf3_len = client->total;
 
         printf("\nfile size : %ld KB\n", pbuf3_len);
         pbuf3 = platform_memory_alloc(pbuf3_len);
+
+        fp = fopen(FILE_NAME3, "wb");
+        if (fp == NULL) {
+            printf("\nopen %s file fail ...\n", FILE_NAME3);
+        } else {
+            printf("\nopen %s file success ...\n", FILE_NAME3);
+        }
     }
     
     memcpy(pbuf3 + process_len, event->data, event->len);
@@ -145,6 +153,14 @@ static int _http_cb3(void *e)
     process_len += event->len;
 
     printf_progress_bar(process_len, pbuf3_len);
+
+    if (process_len >= client->total) {
+        fwrite(pbuf3, 1, pbuf3_len, fp);
+        fflush(fp);
+        fclose(fp);
+        platform_memory_free(pbuf3);
+        pbuf3 = NULL;
+    }
 
     return 0;
 }
@@ -159,7 +175,7 @@ void http_get_file_test(void)
 
     http_client_get(URL2, _http_cb2);
 
-    // http_client_get(URL3, _http_cb3);
+    http_client_get(URL3, _http_cb3);
 
     printf("\n---------------------- http_get_file_test end ----------------------\n");
 }

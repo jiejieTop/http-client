@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-26 21:15:46
+ * @LastEditTime: 2020-06-01 23:52:37
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -220,9 +220,9 @@ void http_client_release(http_client_t *c)
 
     platform_mutex_unlock(&_client_pool_lock);
 
-    http_release_connect_params(c->connect_params);
-
     http_interceptor_release(c->interceptor);
+
+    http_release_connect_params_variables(c->connect_params);
 
     _http_client_variables_init(c);
 }

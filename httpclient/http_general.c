@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-08 21:08:26
- * @LastEditTime: 2020-05-15 14:34:55
+ * @LastEditTime: 2020-06-01 23:51:51
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -33,6 +33,10 @@ http_connect_params_t *http_assign_connect_params(void)
     return connect_params;
 }
 
+void http_release_connect_params_variables(http_connect_params_t *connect_params)
+{
+    HTTP_FREE_ALL_CONNECT_PARAMS(connect_params);
+}
 
 void http_release_connect_params(http_connect_params_t *connect_params)
 {
