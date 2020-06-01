@@ -14,14 +14,16 @@
 #define     NETWORK_CHANNEL_TLS     1
 
 typedef struct network {
-    int                         socket;
-    int                         channel;        /* tcp or tls */
     const char                  *host;
     const char                  *port;
+    int                         socket;
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
+    int                         channel;        /* tcp or tls */
     const char                  *ca_crt;
     unsigned int                ca_crt_len;
     unsigned int                timeout_ms;            // SSL handshake timeout in millisecond
     void                        *nettype_tls_params;
+#endif
 } network_t;
 
 int network_init(network_t *n, const char *host, const char *port, const char *ca);

@@ -10,6 +10,8 @@
 #include <http_utils.h>
 #include <platform_memory.h>
 
+#ifdef HTTP_USING_WORK_QUEUE
+
 static http_wq_pool_t _wq_pool;
 
 static http_worker_t *_http_get_frist_worker(http_wq_t *wq)
@@ -88,7 +90,7 @@ static void _http_wq_thread(void *arg)
 
 static int _http_wq_init(http_wq_t *wq)
 {
-    HTTP_ROBUSTNESS_CHECK(wq, HTTP_NULL_VALUE_ERROR)
+    HTTP_ROBUSTNESS_CHECK(wq, HTTP_NULL_VALUE_ERROR);
 
     wq->loop = 1;
     http_list_init(&wq->list);
@@ -108,7 +110,7 @@ static int _http_wq_init(http_wq_t *wq)
 static void _http_wq_deinit(http_wq_t *wq)
 {
     http_worker_t *w;
-    HTTP_ROBUSTNESS_CHECK(wq, HTTP_VOID)
+    HTTP_ROBUSTNESS_CHECK(wq, HTTP_VOID);
 
     while ((w = _http_get_frist_worker(wq))) {
         _http_wq_worker_destroy(w);
@@ -123,7 +125,7 @@ static void _http_wq_deinit(http_wq_t *wq)
 static void _http_wq_wait(http_wq_t *wq)
 {
     http_worker_t *w;
-    HTTP_ROBUSTNESS_CHECK(wq, HTTP_VOID)
+    HTTP_ROBUSTNESS_CHECK(wq, HTTP_VOID);
 
     if (NULL != wq->thread) {
         platform_thread_startup(wq->thread);
@@ -153,7 +155,7 @@ int http_wq_pool_init(void)
     
     http_wq_t *wq = platform_memory_alloc(cpus * sizeof(http_wq_t));
 
-    HTTP_ROBUSTNESS_CHECK(wq, HTTP_NULL_VALUE_ERROR)
+    HTTP_ROBUSTNESS_CHECK(wq, HTTP_NULL_VALUE_ERROR);
 
     _wq_pool.wq = wq;
     for (i = 0; i < cpus; ++i, ++wq) {
@@ -183,7 +185,7 @@ void http_wq_pool_deinit(void)
 
 int http_wq_add_task(http_worker_func_t func, void *data, size_t len)
 {
-    HTTP_ROBUSTNESS_CHECK(func, HTTP_MEM_NOT_ENOUGH_ERROR)
+    HTTP_ROBUSTNESS_CHECK(func, HTTP_MEM_NOT_ENOUGH_ERROR);
 
     int i = ++_wq_pool.ring % _wq_pool.cpus;
     http_wq_t *wq = _wq_pool.wq + i;
@@ -204,3 +206,4 @@ void http_wq_wait_exit(void)
     }
 }
 
+#endif // HTTP_USING_WORK_QUEUE

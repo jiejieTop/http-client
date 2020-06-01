@@ -13,36 +13,40 @@
 
 int network_read(network_t *n, unsigned char *buf, int len, int timeout)
 {
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
     if (n->channel)
         return nettype_tls_read(n, buf, len, timeout);
-
+#endif
     return nettype_tcp_read(n, buf, len, timeout);
 }
 
 int network_write(network_t *n, unsigned char *buf, int len, int timeout)
 {
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
     if (n->channel)
         return nettype_tls_write(n, buf, len, timeout);
-
+#endif
     return nettype_tcp_write(n, buf, len, timeout);
 }
 
 int network_connect(network_t *n)
 {
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
     if (n->channel)
         return nettype_tls_connect(n);
-    
+#endif
     return nettype_tcp_connect(n);
 
 }
 
 void network_disconnect(network_t *n)
 {
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
     if (n->channel)
         nettype_tls_disconnect(n);
     else
+#endif
         nettype_tcp_disconnect(n);
-
 }
 
 int network_init(network_t *n, const char *host, const char *port, const char *ca)
@@ -53,12 +57,14 @@ int network_init(network_t *n, const char *host, const char *port, const char *c
     n->socket = -1;
     n->host = host;
     n->port = port;
+
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
     n->channel = 0;
 
     if (NULL != ca) {
         network_set_ca(n, ca);
     }
-
+#endif
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
@@ -72,11 +78,14 @@ void network_release(network_t* n)
 
 void network_set_channel(network_t *n, int channel)
 {
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
     n->channel = channel;
+#endif
 }
 
 int network_set_ca(network_t *n, const char *ca)
 {
+#ifndef HTTP_NETWORK_TYPE_NO_TLS
     if ((NULL == n) || (NULL == ca))
         RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
     
@@ -84,7 +93,7 @@ int network_set_ca(network_t *n, const char *ca)
     n->ca_crt_len = strlen(ca);
     n->channel = NETWORK_CHANNEL_TLS;
     n->timeout_ms = HTTP_TLS_HANDSHAKE_TIMEOUT;
-
+#endif
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 

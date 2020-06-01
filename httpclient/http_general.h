@@ -43,9 +43,9 @@
 
 #define HTTP_FREE_CONNECT_PARAMS(conn, name)                                \
     do {                                                                    \
-        if ( NULL != ( conn->http_##name ) ) {                                \
-            platform_memory_free( conn->http_##name );                  \
-            conn->http_##name = NULL;                                   \
+        if ( NULL != ( conn->http_##name ) ) {                              \
+            platform_memory_free( conn->http_##name );                      \
+            conn->http_##name = NULL;                                       \
         }                                                                   \
     } while(0)
 

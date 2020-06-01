@@ -158,6 +158,7 @@ void http_client_exit(void)
     
 #ifdef HTTP_USING_WORK_QUEUE
     http_wq_wait_exit();
+    http_wq_pool_deinit();
 #endif
 
     do {
