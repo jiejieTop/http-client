@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:36
- * @LastEditTime: 2020-05-12 09:09:01
+ * @LastEditTime: 2020-06-02 18:02:11
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -53,6 +53,7 @@ int http_request_init(http_request_t *req)
 {
     HTTP_ROBUSTNESS_CHECK(req , HTTP_NULL_VALUE_ERROR);
 
+    req->flag.all_flag = 0;
     req->req_msg.line = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
     req->req_msg.header = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
     req->req_msg.body = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
@@ -83,7 +84,7 @@ int http_request_header_init(http_request_t *req)
     req->header_index = 0;
     http_message_buffer_reinit(req->req_msg.header);
 
-    if (req->req_flag.flag_t.keep_alive) {
+    if (req->flag.flag_t.keep_alive) {
         http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Keep-Alive");
     } else {
         http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Close");
@@ -101,7 +102,6 @@ int http_request_set_version(http_request_t *req, const char *str)
     HTTP_ROBUSTNESS_CHECK((req && str) , HTTP_NULL_VALUE_ERROR);
     if (http_utils_nmatch(str, "HTTP/", 5) == 0) {
         _http_request_version = str;
-        req->req_flag.flag_t.no_is_http11 = 1;
     } else {
         RETURN_ERROR(HTTP_NULL_VALUE_ERROR);
     }
@@ -112,7 +112,7 @@ int http_request_set_version(http_request_t *req, const char *str)
 int http_request_set_keep_alive(http_request_t *req)
 {
     HTTP_ROBUSTNESS_CHECK(req , HTTP_NULL_VALUE_ERROR);
-    req->req_flag.flag_t.keep_alive = 1;
+    req->flag.flag_t.keep_alive = 1;
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 

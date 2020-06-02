@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-06-02 00:30:32
+ * @LastEditTime: 2020-06-02 22:52:58
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -39,7 +39,12 @@ static int _http_client_internal_event_handle(void *e)
         RETURN_ERROR(HTTP_SUCCESS_ERROR);
 
     if (c->interest_event & event->type) {
+        if (c->interest_event & http_event_type_on_request) {
+            http_interceptor_set_keep_alive(interceptor);
+            c->interest_event &= ~http_event_type_on_request;
+        } else {
             http_event_dispatch(c->event, event->type, c, event->data, event->len);
+        }
     }
     return 0;
 }
@@ -54,7 +59,8 @@ static void _http_client_wq_handle(void *client)
                              c->data, 
                              c,
                              _http_client_internal_event_handle);
-    http_client_release(c);
+    if (!c->flag.flag_t.keep_alive)
+        http_client_release(c);
 }
 
 int _http_client_create(void)
@@ -121,23 +127,26 @@ void _http_client_destroy(http_client_t *c)
     http_list_del(&c->list);
 }
 
-int _http_client_handle(const char *url, void *data, http_request_method_t method, http_event_cb_t cb)
+http_client_t *_http_client_handle(http_client_t *c, const char *url, void *data, http_request_method_t method, http_event_type_t et, http_event_cb_t cb, uint32_t flags)
 {
-    http_client_t *c = NULL;
+    HTTP_ROBUSTNESS_CHECK(url, NULL);
 
-    HTTP_ROBUSTNESS_CHECK(url, HTTP_NULL_VALUE_ERROR);
+    if (NULL == c)
+        c = http_client_lease();
+    
+    HTTP_ROBUSTNESS_CHECK(c, NULL);
 
-    c = http_client_lease();
+    if (flags & http_keep_alive_flag)
+        c->flag.flag_t.keep_alive = 1;
 
-    HTTP_ROBUSTNESS_CHECK(c, HTTP_FAILED_ERROR);
-    http_client_set_interest_event(c, http_event_type_on_body);
+    http_client_set_interest_event(c, et);
     http_client_set_method(c, method);
     http_client_set_data(c, data);
     http_event_register(c->event, cb);
     http_url_parsing(c->connect_params, url);
 
 #ifdef HTTP_USING_WORK_QUEUE
-    return http_wq_add_task(_http_client_wq_handle, c, sizeof(c));
+    http_wq_add_task(_http_client_wq_handle, c, sizeof(c));
 #else
     int res = http_interceptor_process( c->interceptor, 
                                         c->connect_params, 
@@ -145,9 +154,14 @@ int _http_client_handle(const char *url, void *data, http_request_method_t metho
                                         c->data, 
                                         c,
                                         _http_client_internal_event_handle);
-    http_client_release(c);
-    return res;
+    
+    if (!c->flag.flag_t.keep_alive)
+        http_client_release(c);
+    
+    if (res < 0)
+        return NULL;
 #endif // HTTP_USING_WORK_QUEUE 
+    return c;
 }
 
 int http_client_init(const char *ca)
@@ -246,11 +260,24 @@ void http_client_set_data(http_client_t *c, void *data)
 
 int http_client_get(const char *url, http_event_cb_t cb)
 {
-    return _http_client_handle(url, NULL, HTTP_REQUEST_METHOD_GET, cb);
+    _http_client_handle(NULL, url, NULL, HTTP_REQUEST_METHOD_GET, http_event_type_on_body, cb, 0);
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 int http_client_post(const char *url, void *data, http_event_cb_t cb)
 {
-    return _http_client_handle(url, data, HTTP_REQUEST_METHOD_POST, cb);
+    _http_client_handle(NULL, url, data, HTTP_REQUEST_METHOD_POST, http_event_type_on_body, cb, 0);
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
+}
+
+
+http_client_t *http_client_get_persistent(http_client_t *c, const char *url, http_event_cb_t cb)
+{
+    if (NULL == c){
+        c = _http_client_handle(c, url, NULL, HTTP_REQUEST_METHOD_GET,(http_event_type_on_body | http_event_type_on_request), cb, http_keep_alive_flag);
+    } else {
+        _http_client_handle(c, url, NULL, HTTP_REQUEST_METHOD_GET, http_event_type_on_body, cb, 0);
+    }
+    return c;
 }
 

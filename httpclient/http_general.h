@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-08 21:08:39
- * @LastEditTime: 2020-06-01 23:52:17
+ * @LastEditTime: 2020-06-02 22:17:06
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_GENERAL_H_
@@ -13,6 +13,25 @@
 
 #define DEFAULT_HTTP_PORT   "80"
 #define DEFAULT_HTTPS_PORT  "443"
+
+#define HTTP_GENERAL_FLAG                                   \
+    union {                                                 \
+        uint32_t                        all_flag;           \
+        struct {                                            \
+            uint32_t again              : 4;                \
+            uint32_t redirects          : 4;                \
+            uint32_t retry              : 4;                \
+            uint32_t authenticate       : 4;                \
+            uint32_t chunked            : 4;                \
+            uint32_t chunked_complete   : 4;                \
+            uint32_t complete           : 4;                \
+            uint32_t keep_alive         : 4;                \
+        } flag_t;                                           \
+    } flag;                                                 
+
+typedef enum {
+    http_keep_alive_flag   =   0x0001 << 0
+} http_general_flag_t;
 
 #define HTTP_GET_CONNECT_PARAMS_DEFINE(name, type, res)                                     \
     type http_get_connect_params_##name(http_connect_params_t *conn) {                      \

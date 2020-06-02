@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-17 12:09:42
+ * @LastEditTime: 2020-06-02 20:33:32
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -43,19 +43,7 @@ typedef struct http_interceptor {
     struct http_parser_settings *parser_settings;
     http_event_t                *evetn;
     void                        *owner;
-    union {
-        uint32_t                all_flag;
-        struct {
-            uint32_t again              : 4;
-            uint32_t redirects          : 4;
-            uint32_t retry              : 4;
-            uint32_t authenticate       : 4;
-            uint32_t chunked            : 4;
-            uint32_t chunked_complete   : 4;
-            uint32_t complete           : 4;
-            uint32_t keep_alive         : 4;
-        } flag_t;
-    } flag;
+    HTTP_GENERAL_FLAG;
 } http_interceptor_t;
 
 
@@ -64,6 +52,7 @@ void http_interceptor_set_ca(const char *ca);
 void http_interceptor_set_owner(http_interceptor_t *interceptor, void *owner);
 void http_interceptor_event_register(http_interceptor_t *interceptor, http_event_cb_t cb);
 int http_interceptor_connect(http_interceptor_t *interceptor);
+void http_interceptor_set_keep_alive(http_interceptor_t *interceptor);
 int http_interceptor_set_connect_params(http_interceptor_t *interceptor, http_connect_params_t *conn_param);
 int http_interceptor_request(http_interceptor_t *interceptor, http_request_method_t mothod, const char *post_buf);
 int http_interceptor_release(http_interceptor_t *interceptor);

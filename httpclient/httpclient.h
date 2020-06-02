@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-05-26 20:36:20
+ * @LastEditTime: 2020-06-02 22:36:15
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTPCLIENT_H_
@@ -38,6 +38,7 @@ typedef struct http_client {
     size_t                              process;
     size_t                              total;
     void                                *data;
+    HTTP_GENERAL_FLAG;
 } http_client_t;
 
 int http_client_init(const char *ca);
@@ -51,5 +52,7 @@ void http_client_set_interest_event(http_client_t *c, http_event_type_t event);
 
 void http_client_set_method(http_client_t *c, http_request_method_t method);
 void http_client_set_data(http_client_t *c, void *data);
+
+http_client_t *http_client_get_persistent(http_client_t *c, const char *url, http_event_cb_t cb);
 
 #endif /* _HTTPCLIENT_H_ */

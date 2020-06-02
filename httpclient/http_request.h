@@ -2,13 +2,14 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:42
- * @LastEditTime: 2020-05-12 09:07:45
+ * @LastEditTime: 2020-06-02 17:41:32
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #ifndef _HTTP_REQUEST_H_
 #define _HTTP_REQUEST_H_
 
 #include <stdint.h>
+#include <http_general.h>
 #include <http_message_buffer.h>
 
 
@@ -60,28 +61,17 @@ typedef enum http_request_header {
     HTTP_REQUEST_HEADER_CONTENT_TYPE
 } http_request_header_t;
 
-
-
 typedef struct http_request_message {
     http_message_buffer_t           *line;
     http_message_buffer_t           *header;
     http_message_buffer_t           *body;
 } http_request_message_t;
 
-
-
 typedef struct http_request {
     http_request_method_t           method;
     http_request_message_t          req_msg;
     uint32_t                        header_index;
-    union {
-        uint32_t                    flag;
-        struct {
-            uint32_t keep_alive     : 8;
-            uint32_t no_is_http11   : 8;
-            uint32_t othre          : 16;
-        } flag_t;
-    } req_flag;
+    HTTP_GENERAL_FLAG;
 } http_request_t;
 
 int http_request_init(http_request_t *req);

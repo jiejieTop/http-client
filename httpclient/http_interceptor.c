@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-05-26 19:24:47
+ * @LastEditTime: 2020-06-02 23:02:13
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -192,8 +192,7 @@ static int _http_on_body(http_parser *parser, const char *at, size_t length)
 
     interceptor->data_process += length;
 
-    http_event_dispatch(interceptor->evetn, http_event_type_on_body, interceptor, (void *)at, length);
-    return 0;
+    return http_event_dispatch(interceptor->evetn, http_event_type_on_body, interceptor, (void *)at, length);
 }
 
 static int _http_on_chunk_header(http_parser *parser)
@@ -388,6 +387,12 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
 
     http_request_set_method(&interceptor->request, mothod);
 
+    http_event_dispatch(interceptor->evetn, 
+                        http_event_type_on_request, 
+                        interceptor, 
+                        http_message_buffer_get_data(interceptor->message), 
+                        http_message_buffer_get_used(interceptor->message));
+
     if (NULL == http_get_connect_params_query(interceptor->connect_params)) {
         http_request_set_start_line(&interceptor->request, http_get_connect_params_path(interceptor->connect_params));
     } else {
@@ -428,16 +433,11 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
                                 http_request_get_body_data(&interceptor->request), 
                                 HTTP_CRLF, NULL);
 
+    // http_request_print_header(&interceptor->request);
     // HTTP_LOG_D("len:%ld\ndata:%s",interceptor->write_buf->used, interceptor->write_buf->data);
     res = _http_write_buffer(interceptor, 
                             http_message_buffer_get_data(interceptor->message), 
                             http_message_buffer_get_used(interceptor->message));
-    
-    http_event_dispatch(interceptor->evetn, 
-                        http_event_type_on_request, 
-                        interceptor, 
-                        http_message_buffer_get_data(interceptor->message), 
-                        http_message_buffer_get_used(interceptor->message));
 
     if (HTTP_SUCCESS_ERROR == res) {
 
@@ -490,14 +490,13 @@ int http_interceptor_submit_data(http_interceptor_t *interceptor)
     if ((http_interceptor_status_response_complete != _http_interceptor_get_status(interceptor)) || 
         (http_interceptor_status_response_body != _http_interceptor_get_status(interceptor)))
         RETURN_ERROR(HTTP_SUCCESS_ERROR);
-    
-    http_event_dispatch(interceptor->evetn, 
-                        http_event_type_on_submit, 
-                        interceptor, 
-                        http_response_get_message_data(&interceptor->response), 
-                        http_response_get_message_len(&interceptor->response));
 
-    _http_interceptor_set_status(interceptor, http_interceptor_status_release);
+    if (interceptor->flag.flag_t.keep_alive) {
+        _http_interceptor_set_status(interceptor, http_interceptor_status_connect);
+    } else {
+        _http_interceptor_set_status(interceptor, http_interceptor_status_release);
+    }
+    RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }
 
 int http_interceptor_release(http_interceptor_t *interceptor)
@@ -536,7 +535,6 @@ int http_interceptor_release(http_interceptor_t *interceptor)
     }
 
     http_request_release(&interceptor->request);
-    http_response_release(&interceptor->response);
 
     _http_interceptor_set_status(interceptor, http_interceptor_status_invalid);
 
@@ -614,7 +612,13 @@ int http_interceptor_process(http_interceptor_t *interceptor,
         }
 
     } while (interceptor->flag.flag_t.again);
+    RETURN_ERROR(res);
+}
 
+void http_interceptor_set_keep_alive(http_interceptor_t *interceptor)
+{
+    http_request_set_keep_alive(&interceptor->request);
+    interceptor->flag.flag_t.keep_alive = 1;
 }
 
 
