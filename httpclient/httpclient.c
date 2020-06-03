@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2019-12-09 21:31:25
- * @LastEditTime: 2020-06-02 22:52:58
+ * @LastEditTime: 2020-06-03 16:42:00
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 #include "httpclient.h"
@@ -148,13 +148,14 @@ http_client_t *_http_client_handle(http_client_t *c, const char *url, void *data
 #ifdef HTTP_USING_WORK_QUEUE
     http_wq_add_task(_http_client_wq_handle, c, sizeof(c));
 #else
+    printf("\nhttp_interceptor_process start\n");
     int res = http_interceptor_process( c->interceptor, 
                                         c->connect_params, 
                                         c->method, 
                                         c->data, 
                                         c,
                                         _http_client_internal_event_handle);
-    
+    printf("\nhttp_interceptor_process end\n");
     if (!c->flag.flag_t.keep_alive)
         http_client_release(c);
     

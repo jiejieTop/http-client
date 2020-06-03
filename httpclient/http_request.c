@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-05-05 17:20:36
- * @LastEditTime: 2020-06-02 18:02:11
+ * @LastEditTime: 2020-06-03 19:32:43
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -53,7 +53,6 @@ int http_request_init(http_request_t *req)
 {
     HTTP_ROBUSTNESS_CHECK(req , HTTP_NULL_VALUE_ERROR);
 
-    req->flag.all_flag = 0;
     req->req_msg.line = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
     req->req_msg.header = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
     req->req_msg.body = http_message_buffer_init(HTTP_MESSAGE_BUFFER_GROWTH);
@@ -84,14 +83,14 @@ int http_request_header_init(http_request_t *req)
     req->header_index = 0;
     http_message_buffer_reinit(req->req_msg.header);
 
+    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_USER_AGENT, "http-client-by-jiejie");
+    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_ACCEPT, "*/*");
+
     if (req->flag.flag_t.keep_alive) {
-        http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Keep-Alive");
+        http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "keep-alive");
     } else {
         http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_CONNECTION, "Close");
     }
-
-    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_ACCEPT, "*/*");
-    http_request_add_header_form_index(req, HTTP_REQUEST_HEADER_USER_AGENT, "http-client-by-jiejie");
 
     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 }

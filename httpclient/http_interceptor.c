@@ -2,7 +2,7 @@
  * @Author: jiejie
  * @Github: https://github.com/jiejieTop
  * @Date: 2020-04-16 20:31:12
- * @LastEditTime: 2020-06-02 23:02:13
+ * @LastEditTime: 2020-06-03 21:19:52
  * @Description: the code belongs to jiejie, please keep the author information and source code according to the license.
  */
 
@@ -119,7 +119,7 @@ static int _http_on_status(http_parser *parser, const char *at, size_t length)
 static int _http_on_header_field(http_parser *parser, const char *at, size_t length)
 {
     http_interceptor_t *interceptor = parser->data;
-    // printf("%.*s :", (int)length, at);
+    printf("%.*s :", (int)length, at);
 
     if(0 == http_utils_ignore_case_nmatch(at, "Location", 8)) {
         interceptor->flag.flag_t.redirects = 1;
@@ -141,7 +141,7 @@ static int _http_on_header_value(http_parser *parser, const char *at, size_t len
         interceptor->flag.flag_t.redirects = 0;
     }
 
-    // printf("%.*s\n", (int)length, at);
+    printf("%.*s\n", (int)length, at);
     return 0;
 }
 
@@ -153,8 +153,8 @@ static int _http_on_headers_complete(http_parser *parser)
     http_response_set_offset(&interceptor->response, parser->nread);
     http_response_set_length(&interceptor->response, parser->content_length);
 
-    // HTTP_LOG_I("_http_on_headers_complete, status=%d, offset=%d, nread=%d, content_length = %d\n", 
-    //             parser->status_code, interceptor->response.offset, parser->nread, parser->content_length);
+    HTTP_LOG_I("_http_on_headers_complete, status=%d, offset=%d, nread=%d, content_length = %ld\n", 
+                parser->status_code, interceptor->response.offset, parser->nread, parser->content_length);
 
     http_event_dispatch(interceptor->evetn, http_event_type_on_headers, interceptor, NULL, 0);
 
@@ -285,7 +285,6 @@ int http_interceptor_init(http_interceptor_t *interceptor)
     
     HTTP_ROBUSTNESS_CHECK(interceptor->network, HTTP_MEM_NOT_ENOUGH_ERROR);
 
-    http_request_init(&interceptor->request);
     http_response_init(&interceptor->response);
 
     interceptor->cmd_timeout = HTTP_DEFAULT_CMD_TIMEOUT;
@@ -296,14 +295,11 @@ int http_interceptor_init(http_interceptor_t *interceptor)
     
     if (NULL == interceptor->evetn)
         interceptor->evetn = http_event_init();
-    
-    if (NULL == interceptor->message)
-        interceptor->message = http_message_buffer_init(0);
 
     if (NULL == interceptor->buffer)
         interceptor->buffer = platform_memory_alloc(interceptor->buffer_len);
 
-    HTTP_ROBUSTNESS_CHECK((interceptor->evetn && interceptor->message && interceptor->buffer), HTTP_MEM_NOT_ENOUGH_ERROR);
+    HTTP_ROBUSTNESS_CHECK((interceptor->evetn && interceptor->buffer), HTTP_MEM_NOT_ENOUGH_ERROR);
 
     res = _http_interceptor_prepare(interceptor);
     if (HTTP_SUCCESS_ERROR != res)
@@ -368,7 +364,7 @@ int http_interceptor_connect(http_interceptor_t *interceptor)
 
     if (HTTP_SUCCESS_ERROR == res) {
         _http_interceptor_set_status(interceptor, http_interceptor_status_connect);
-        HTTP_LOG_D("interceptor connect success ...\n");
+        HTTP_LOG_I("interceptor connect success ...\n");
     } else {
         HTTP_LOG_D("interceptor connect fail ...\n");
         _http_interceptor_set_status(interceptor, http_interceptor_status_release);
@@ -382,16 +378,17 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
     int res = HTTP_SUCCESS_ERROR;
     HTTP_ROBUSTNESS_CHECK((interceptor && mothod), HTTP_NULL_VALUE_ERROR);
     
+    http_request_init(&interceptor->request);
+
+    if (NULL == interceptor->message)
+        interceptor->message = http_message_buffer_init(0);
+
     if (http_interceptor_status_connect != _http_interceptor_get_status(interceptor))
         RETURN_ERROR(HTTP_SUCCESS_ERROR);
 
     http_request_set_method(&interceptor->request, mothod);
 
-    http_event_dispatch(interceptor->evetn, 
-                        http_event_type_on_request, 
-                        interceptor, 
-                        http_message_buffer_get_data(interceptor->message), 
-                        http_message_buffer_get_used(interceptor->message));
+    http_event_dispatch(interceptor->evetn, http_event_type_on_request, interceptor, NULL, 0);
 
     if (NULL == http_get_connect_params_query(interceptor->connect_params)) {
         http_request_set_start_line(&interceptor->request, http_get_connect_params_path(interceptor->connect_params));
@@ -432,17 +429,17 @@ int http_interceptor_request(http_interceptor_t *interceptor, http_request_metho
     http_message_buffer_concat( interceptor->message, 
                                 http_request_get_body_data(&interceptor->request), 
                                 HTTP_CRLF, NULL);
-
+    // http_request_print_start_line(&interceptor->request);
     // http_request_print_header(&interceptor->request);
-    // HTTP_LOG_D("len:%ld\ndata:%s",interceptor->write_buf->used, interceptor->write_buf->data);
+    HTTP_LOG_I("len:%ld\ndata:%s", http_message_buffer_get_used(interceptor->message), http_message_buffer_get_data(interceptor->message));
     res = _http_write_buffer(interceptor, 
                             http_message_buffer_get_data(interceptor->message), 
                             http_message_buffer_get_used(interceptor->message));
 
+    /* send data successfully, free the memory space of the request message*/
+    http_request_release(&interceptor->request);
+    
     if (HTTP_SUCCESS_ERROR == res) {
-
-        /* send data successfully, free the memory space of the request message, emm... no keep alive */
-        http_request_release(&interceptor->request);
 
         _http_interceptor_set_status(interceptor, http_interceptor_status_request);
 
@@ -487,9 +484,9 @@ int http_interceptor_submit_data(http_interceptor_t *interceptor)
 {
     // HTTP_LOG_I("http_interceptor_submit_data:\n%s\n", http_response_get_message_body(&interceptor->response));
 
-    if ((http_interceptor_status_response_complete != _http_interceptor_get_status(interceptor)) || 
-        (http_interceptor_status_response_body != _http_interceptor_get_status(interceptor)))
-        RETURN_ERROR(HTTP_SUCCESS_ERROR);
+    // if ((http_interceptor_status_response_complete != _http_interceptor_get_status(interceptor)) || 
+    //     (http_interceptor_status_response_body != _http_interceptor_get_status(interceptor)))
+    //     RETURN_ERROR(HTTP_SUCCESS_ERROR);
 
     if (interceptor->flag.flag_t.keep_alive) {
         _http_interceptor_set_status(interceptor, http_interceptor_status_connect);
@@ -503,6 +500,9 @@ int http_interceptor_release(http_interceptor_t *interceptor)
 {
     HTTP_ROBUSTNESS_CHECK(interceptor, HTTP_NULL_VALUE_ERROR);
     
+    if (http_interceptor_status_release != _http_interceptor_get_status(interceptor))
+        RETURN_ERROR(HTTP_SUCCESS_ERROR);
+
     if (interceptor->network) {
         network_release(interceptor->network);
         platform_memory_free(interceptor->network);
@@ -534,7 +534,7 @@ int http_interceptor_release(http_interceptor_t *interceptor)
         interceptor->buffer = NULL;
     }
 
-    http_request_release(&interceptor->request);
+    // http_request_release(&interceptor->request);
 
     _http_interceptor_set_status(interceptor, http_interceptor_status_invalid);
 
@@ -560,6 +560,8 @@ int http_interceptor_fetch_data(http_interceptor_t *interceptor)
     } while ((interceptor->data_process < interceptor->response.length) ||
             ((interceptor->flag.flag_t.chunked && !interceptor->flag.flag_t.chunked_complete)));
 
+    _http_interceptor_set_status(interceptor, http_interceptor_status_response_complete);
+
     RETURN_ERROR(len);
 }
 
@@ -574,11 +576,13 @@ int http_interceptor_process(http_interceptor_t *interceptor,
     int res = HTTP_SUCCESS_ERROR;
     HTTP_ROBUSTNESS_CHECK((interceptor && connect_params && mothod), HTTP_NULL_VALUE_ERROR);
 
-    do {
+    // do {
         if (interceptor->flag.flag_t.again) {
             interceptor->flag.flag_t.again = 0;
             interceptor->status = 0;
         }
+
+        HTTP_LOG_W("interceptor->status : %d", interceptor->status);
 
         switch (interceptor->status) {
             case http_interceptor_status_invalid:
@@ -611,7 +615,7 @@ int http_interceptor_process(http_interceptor_t *interceptor,
                 break;
         }
 
-    } while (interceptor->flag.flag_t.again);
+    // } while (interceptor->flag.flag_t.again);
     RETURN_ERROR(res);
 }
 
