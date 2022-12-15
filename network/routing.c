@@ -69,8 +69,8 @@ void routing_record(const char *host, const char *ip)
     }
 #endif
 
-    int host_len = strlen(host);
-    int ip_len = strlen(ip);
+    int host_len = strlen(host) + 1;
+    int ip_len = strlen(ip) + 1;
 
     if (_routing_index >= ROUTING_TABLE_SIZE - 1)
         _routing_index = 0;
