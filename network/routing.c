@@ -97,8 +97,8 @@ void routing_record(const char *host, const char *ip)
         routing->ip = NULL;
     }
 
-    routing->host = platform_memory_alloc(host_len);
-    routing->ip = platform_memory_alloc(ip_len);
+    routing->host = platform_memory_alloc(host_len+1);
+    routing->ip = platform_memory_alloc(ip_len+1);
 
     if ((NULL != routing->host) && (NULL != routing->ip)) {
         
@@ -107,7 +107,7 @@ void routing_record(const char *host, const char *ip)
         memcpy(routing->host, host, host_len);
         memcpy(routing->ip, ip, ip_len);
 
-        routing->host[host_len] = '\0';
+        routing->host[host_len] = '\0'; //这里越界了，比如申请10个字节，数组访问最多到9(0~9),所以申请多申请一个字节
         routing->ip[ip_len] = '\0';
 
     } else {
