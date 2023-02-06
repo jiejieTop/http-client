@@ -263,7 +263,17 @@ int http_interceptor_check_response(http_interceptor_t *interceptor)
         case http_response_status_temporary_redirect:
             interceptor->flag.flag_t.again = 1;
             _http_interceptor_set_status(interceptor, http_interceptor_status_release);
-            http_url_parsing(interceptor->connect_params, http_get_connect_params_url(interceptor->connect_params));
+            char *p_new_url = NULL;
+            size_t len = strlen(http_get_connect_params_url(interceptor->connect_params))+1;
+            p_new_url = platform_memory_alloc(len);
+            if(!p_new_url) {
+            if(!p_new_url) {
+                RETURN_ERROR(HTTP_FAILED_ERROR);
+            }
+            memcpy(p_new_url,http_get_connect_params_url(interceptor->connect_params),strlen(http_get_connect_params_url(interceptor->connect_params)));
+            http_url_parsing(interceptor->connect_params, p_new_url);
+            platform_memory_free(p_new_url);
+            p_new_url = NULL;
             break;
 
         default:
