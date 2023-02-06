@@ -267,7 +267,6 @@ int http_interceptor_check_response(http_interceptor_t *interceptor)
             size_t len = strlen(http_get_connect_params_url(interceptor->connect_params))+1;
             p_new_url = platform_memory_alloc(len);
             if(!p_new_url) {
-            if(!p_new_url) {
                 RETURN_ERROR(HTTP_FAILED_ERROR);
             }
             memcpy(p_new_url,http_get_connect_params_url(interceptor->connect_params),strlen(http_get_connect_params_url(interceptor->connect_params)));
